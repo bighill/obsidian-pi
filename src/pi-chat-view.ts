@@ -135,7 +135,9 @@ export class PiChatView extends ItemView {
         this.handleSessionEvent(event)
       })
 
-      this.statusEl.setText('Ready')
+      const model = this.session.model
+      const modelLabel = model ? model.name : 'Ready'
+      this.statusEl.setText(modelLabel)
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-ready')
     } catch (err) {
