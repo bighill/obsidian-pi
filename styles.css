@@ -225,17 +225,12 @@
   padding: 0;
   border: none;
   border-radius: 6px;
-  background: transparent;
+  background: transparent !important;
   color: var(--interactive-accent);
   cursor: pointer;
-  transition: opacity 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.pi-chat-send:hover:not(:disabled) {
-  background: var(--background-modifier-hover);
 }
 
 .pi-chat-send svg {
@@ -244,10 +239,10 @@
 }
 
 .pi-chat-send:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--background-modifier-hover) !important;
 }
 
 .pi-chat-send:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
