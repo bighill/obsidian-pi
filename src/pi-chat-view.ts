@@ -2,9 +2,9 @@ import { ItemView, MarkdownRenderer, WorkspaceLeaf, setIcon } from 'obsidian'
 import type ObsidianPiPlugin from './main'
 import {
   createAgentSession,
+  DefaultResourceLoader,
   type AgentSession,
   type AgentSessionEvent,
-  type CreateAgentSessionResult,
 } from '@mariozechner/pi-coding-agent'
 import { join } from 'path'
 import { homedir } from 'os'
@@ -27,7 +27,6 @@ interface ToolCallInfo {
 export class PiChatView extends ItemView {
   plugin: ObsidianPiPlugin
   private session: AgentSession | null = null
-  private sessionResult: CreateAgentSessionResult | null = null
   private unsubscribe: (() => void) | null = null
   private messagesEl!: HTMLElement
   private inputEl!: HTMLTextAreaElement
@@ -101,6 +100,14 @@ export class PiChatView extends ItemView {
       this.inputEl.style.height = Math.min(this.inputEl.scrollHeight, 200) + 'px'
     })
 
+    // Focus input on open and whenever the tab becomes active
+    this.registerEvent(this.app.workspace.on('active-leaf-change', (leaf) => {
+      if (leaf === this.leaf) {
+        this.inputEl.focus()
+      }
+    }))
+    this.inputEl.focus()
+
     // ─── Init session ────────────────────────────────────────
     await this.initSession()
   }
@@ -113,11 +120,19 @@ export class PiChatView extends ItemView {
       const cwd = this.plugin.settings.workingDir || this.app.vault.adapter.getBasePath()
       const agentDir = join(homedir(), '.pi', 'agent')
 
-      console.log('obsidian-pi: initSession cwd=', cwd, 'agentDir=', agentDir)
+      const resourceLoader = new DefaultResourceLoader({
+        cwd,
+        agentDir,
+        appendSystemPrompt: [
+          `Current timestamp: ${new Date().toISOString()}`,
+        ],
+      })
+      await resourceLoader.reload()
 
       const options: Record<string, unknown> = {
         cwd,
         agentDir,
+        resourceLoader,
       }
 
       // Apply settings overrides if set
@@ -125,10 +140,8 @@ export class PiChatView extends ItemView {
         options.thinkingLevel = this.plugin.settings.thinkingLevel
       }
 
-      console.log('obsidian-pi: calling createAgentSession…')
-      this.sessionResult = await createAgentSession(options as any)
-      console.log('obsidian-pi: session created')
-      this.session = this.sessionResult.session
+      const result = await createAgentSession(options as any)
+      this.session = result.session
 
       // Subscribe to events
       this.unsubscribe = this.session.subscribe((event: AgentSessionEvent) => {
@@ -334,6 +347,5 @@ export class PiChatView extends ItemView {
     this.unsubscribe?.()
     this.unsubscribe = null
     this.session = null
-    this.sessionResult = null
   }
 }

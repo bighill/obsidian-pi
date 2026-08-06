@@ -17,27 +17,22 @@ export default class ObsidianPiPlugin extends Plugin {
   settings: PiPluginSettings = DEFAULT_SETTINGS
 
   async onload() {
-    console.log('obsidian-pi: onload start')
     await this.loadSettings()
-    console.log('obsidian-pi: settings loaded', this.settings)
 
     this.registerView(
       VIEW_TYPE_PI_CHAT,
       (leaf: WorkspaceLeaf) => new PiChatView(leaf, this),
     )
-    console.log('obsidian-pi: view registered')
 
     this.addRibbonIcon('bot', 'Pi Chat', () => {
       this.activateView()
     })
-    console.log('obsidian-pi: ribbon added')
 
     this.addCommand({
       id: 'open-pi-chat',
       name: 'Open Pi Chat',
       callback: () => this.activateView(),
     })
-    console.log('obsidian-pi: onload done')
   }
 
   async activateView() {

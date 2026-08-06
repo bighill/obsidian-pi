@@ -42,7 +42,6 @@ try {
   process.env.PI_OFFLINE = '1';
 } catch(e) { /* ignore */ }
 var __pi_meta_url = 'file:///dummy-pi-plugin/main.js';
-console.log('[obsidian-pi] module load, PI_PACKAGE_DIR:', process.env.PI_PACKAGE_DIR);
 `;
 
 esbuild.build({
@@ -77,18 +76,4 @@ esbuild.build({
   treeShaking: true,
   outfile: "main.js",
   minify: prod,
-}).then(async () => {
-  if (!prod || process.env.OBSIDIAN_PI_COPY) {
-    const fs = await import("fs");
-    const path = await import("path");
-    const scriptDir = path.dirname(new URL(import.meta.url).pathname);
-    const pluginDir = path.join(scriptDir, "../../garden/.obsidian/plugins/obsidian-pi");
-    if (fs.existsSync(path.dirname(pluginDir))) {
-      fs.mkdirSync(pluginDir, { recursive: true });
-      fs.copyFileSync("main.js", path.join(pluginDir, "main.js"));
-      fs.copyFileSync("styles.css", path.join(pluginDir, "styles.css"));
-      fs.copyFileSync("manifest.json", path.join(pluginDir, "manifest.json"));
-      console.log("Copied to garden/.obsidian/plugins/obsidian-pi/");
-    }
-  }
 }).catch(() => process.exit(1));
