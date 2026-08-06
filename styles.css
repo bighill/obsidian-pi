@@ -201,7 +201,7 @@
   border-radius: 6px;
   padding: 8px 10px;
   font-size: var(--font-text-size);
-  background: var(--background-primary);
+  background: var(--background-primary) !important;
   color: var(--text-normal);
   font-family: var(--font-text);
   line-height: 1.4;
@@ -209,9 +209,14 @@
   overflow-y: auto;
 }
 
+.pi-chat-input:hover {
+  background: var(--background-primary) !important;
+}
+
 .pi-chat-input:focus {
   outline: none;
-  border-color: var(--interactive-accent);
+  border-color: var(--background-modifier-border);
+  box-shadow: none !important;
 }
 
 .pi-chat-input::placeholder {
