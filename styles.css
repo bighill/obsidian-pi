@@ -220,13 +220,14 @@
 
 .pi-chat-send {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent !important;
-  color: var(--interactive-accent);
+  box-shadow: none !important;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -234,15 +235,16 @@
 }
 
 .pi-chat-send svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 .pi-chat-send:hover:not(:disabled) {
-  background: var(--background-modifier-hover) !important;
+  color: var(--interactive-accent);
+  background: transparent !important;
 }
 
 .pi-chat-send:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
