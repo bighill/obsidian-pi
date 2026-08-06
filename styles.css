@@ -220,15 +220,23 @@
 
 .pi-chat-send {
   flex-shrink: 0;
-  padding: 8px 16px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   border: none;
   border-radius: 6px;
   background: var(--interactive-accent);
   color: var(--text-on-accent);
-  font-size: var(--font-text-size);
-  font-weight: var(--font-semibold);
   cursor: pointer;
   transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pi-chat-send svg {
+  width: 16px;
+  height: 16px;
 }
 
 .pi-chat-send:hover:not(:disabled) {

@@ -85,8 +85,8 @@ export class PiChatView extends ItemView {
     })
     this.sendBtn = inputArea.createEl('button', {
       cls: 'pi-chat-send',
-      text: 'Send',
     })
+    setIcon(this.sendBtn, 'send-horizontal')
 
     // ─── Event handlers ─────────────────────────────────────
     this.sendBtn.addEventListener('click', () => this.handleSend())
@@ -322,10 +322,10 @@ export class PiChatView extends ItemView {
 
   private updateSendButton() {
     if (this.isStreaming) {
-      this.sendBtn.setText('⋯')
+      setIcon(this.sendBtn, 'loader')
       this.sendBtn.disabled = true
     } else {
-      this.sendBtn.setText('Send')
+      setIcon(this.sendBtn, 'send-horizontal')
       this.sendBtn.disabled = false
     }
   }
