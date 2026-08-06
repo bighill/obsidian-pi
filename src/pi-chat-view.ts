@@ -113,6 +113,8 @@ export class PiChatView extends ItemView {
       const cwd = this.plugin.settings.workingDir || this.app.vault.getRoot().path
       const agentDir = join(homedir(), '.pi', 'agent')
 
+      console.log('obsidian-pi: initSession cwd=', cwd, 'agentDir=', agentDir)
+
       const options: Record<string, unknown> = {
         cwd,
         agentDir,
@@ -123,7 +125,9 @@ export class PiChatView extends ItemView {
         options.thinkingLevel = this.plugin.settings.thinkingLevel
       }
 
+      console.log('obsidian-pi: calling createAgentSession…')
       this.sessionResult = await createAgentSession(options as any)
+      console.log('obsidian-pi: session created')
       this.session = this.sessionResult.session
 
       // Subscribe to events
@@ -135,6 +139,7 @@ export class PiChatView extends ItemView {
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-ready')
     } catch (err) {
+      console.error('obsidian-pi: initSession error:', err)
       this.statusEl.setText('Error: ' + (err instanceof Error ? err.message : String(err)))
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-error')
