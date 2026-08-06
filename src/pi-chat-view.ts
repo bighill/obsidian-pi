@@ -110,7 +110,7 @@ export class PiChatView extends ItemView {
       this.statusEl.setText('Starting session…')
       this.statusEl.addClass('pi-chat-status-busy')
 
-      const cwd = this.plugin.settings.workingDir || this.app.vault.getRoot().path
+      const cwd = this.plugin.settings.workingDir || this.app.vault.adapter.getBasePath()
       const agentDir = join(homedir(), '.pi', 'agent')
 
       console.log('obsidian-pi: initSession cwd=', cwd, 'agentDir=', agentDir)
