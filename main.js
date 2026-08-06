@@ -11,6 +11,20 @@ try {
   if (__pi_plugin_dir) {
     process.env.PI_PACKAGE_DIR = __pi_plugin_dir;
   }
+  // Obsidian's Electron has a minimal PATH that does not include homebrew or nvm.
+  // The Pi SDK runs npm commands (npm root -g) that need node on PATH.
+  // Prepend common macOS node/npm locations to PATH.
+  var __pi_path_extras = ['/opt/homebrew/bin', '/usr/local/bin', require('os').homedir() + '/.nvm/versions/node'];
+  var __pi_current_path = process.env.PATH || '';
+  var __pi_path_parts = __pi_current_path.split(':');
+  for (var __pi_i = 0; __pi_i < __pi_path_extras.length; __pi_i++) {
+    if (__pi_path_parts.indexOf(__pi_path_extras[__pi_i]) === -1) {
+      __pi_path_parts.unshift(__pi_path_extras[__pi_i]);
+    }
+  }
+  process.env.PATH = __pi_path_parts.join(':');
+  // Set offline mode so the SDK does not try to run npm root -g (which fails in Electron)
+  process.env.PI_OFFLINE = '1';
 } catch(e) { /* ignore */ }
 var __pi_meta_url = 'file:///dummy-pi-plugin/main.js';
 console.log('[obsidian-pi] module load, PI_PACKAGE_DIR:', process.env.PI_PACKAGE_DIR);
