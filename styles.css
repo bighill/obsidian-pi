@@ -1,0 +1,241 @@
+/* ─── Obsidian Pi — theme-safe CSS ──────────────────────────── */
+/* All colors use Obsidian CSS variables so the plugin adapts to any theme. */
+
+.pi-chat-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+}
+
+.pi-chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
+
+.pi-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+}
+
+.pi-chat-title {
+  font-weight: var(--font-semibold);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+}
+
+.pi-chat-status {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.pi-chat-status-busy {
+  color: var(--text-accent);
+}
+
+.pi-chat-status-ready {
+  color: var(--text-success);
+}
+
+.pi-chat-status-error {
+  color: var(--text-error);
+}
+
+/* ─── Messages ──────────────────────────────────────────────── */
+
+.pi-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pi-chat-message {
+  max-width: 85%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: var(--font-text-size);
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.pi-chat-message-user {
+  align-self: flex-end;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-bottom-right-radius: 2px;
+}
+
+.pi-chat-message-assistant {
+  align-self: flex-start;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-bottom-left-radius: 2px;
+}
+
+.pi-chat-message-system {
+  align-self: center;
+  background: var(--background-modifier-error);
+  color: var(--text-on-accent);
+  font-size: var(--font-ui-smaller);
+  text-align: center;
+}
+
+/* ─── Streaming message ────────────────────────────────────── */
+
+.pi-chat-streaming {
+  border-color: var(--background-modifier-border-hover);
+}
+
+/* ─── Message text content ─────────────────────────────────── */
+
+.pi-chat-message-text {
+  /* Let MarkdownRenderer handle the inner styling */
+}
+
+.pi-chat-message-text p:first-child {
+  margin-top: 0;
+}
+
+.pi-chat-message-text p:last-child {
+  margin-bottom: 0;
+}
+
+.pi-chat-message-user .pi-chat-message-text a,
+.pi-chat-message-user .pi-chat-message-text code {
+  color: var(--text-on-accent);
+}
+
+/* ─── Tool calls ────────────────────────────────────────────── */
+
+.pi-chat-tool-call {
+  margin-top: 6px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: var(--font-ui-smaller);
+}
+
+.pi-chat-tool-header {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--background-modifier-hover);
+  color: var(--text-muted);
+  gap: 4px;
+}
+
+.pi-chat-tool-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.pi-chat-tool-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+.pi-chat-tool-running .pi-chat-tool-header {
+  color: var(--text-accent);
+}
+
+.pi-chat-tool-spinner {
+  margin-left: auto;
+  animation: pi-chat-pulse 1.2s infinite;
+}
+
+@keyframes pi-chat-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.pi-chat-tool-done .pi-chat-tool-header {
+  color: var(--text-muted);
+}
+
+.pi-chat-tool-error .pi-chat-tool-header {
+  color: var(--text-error);
+}
+
+.pi-chat-tool-result {
+  padding: 4px 8px;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.pi-chat-tool-result pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+/* ─── Input area ────────────────────────────────────────────── */
+
+.pi-chat-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+  background: var(--background-primary);
+}
+
+.pi-chat-input {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: var(--font-text-size);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-family: var(--font-text);
+  line-height: 1.4;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.pi-chat-input:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+}
+
+.pi-chat-input::placeholder {
+  color: var(--text-faint);
+}
+
+.pi-chat-send {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-size: var(--font-text-size);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.pi-chat-send:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.pi-chat-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

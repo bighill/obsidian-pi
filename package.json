@@ -1,0 +1,23 @@
+{
+  "name": "obsidian-pi",
+  "version": "0.1.0",
+  "description": "Pi CLI agent chat in an Obsidian tab",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["obsidian", "pi", "ai", "agent", "chat"],
+  "author": "bighill",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.28.1",
+    "obsidian": "^1.12.3",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@mariozechner/pi-coding-agent": "^0.67.2"
+  }
+}
