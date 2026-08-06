@@ -42,7 +42,7 @@
 }
 
 .pi-chat-status-ready {
-  color: var(--text-success);
+  color: var(--text-muted);
 }
 
 .pi-chat-status-error {
