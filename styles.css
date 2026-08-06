@@ -225,13 +225,17 @@
   padding: 0;
   border: none;
   border-radius: 6px;
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
+  background: transparent;
+  color: var(--interactive-accent);
   cursor: pointer;
   transition: opacity 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.pi-chat-send:hover:not(:disabled) {
+  background: var(--background-modifier-hover);
 }
 
 .pi-chat-send svg {
