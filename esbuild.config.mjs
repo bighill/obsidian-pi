@@ -71,6 +71,11 @@ esbuild.build({
   ],
   format: "cjs",
   target: "es2018",
+  supported: {
+    // Force esbuild to turn dynamic import() into Promise.resolve(require()).
+    // Obsidian's renderer rejects node:* dynamic imports as CORS requests.
+    "dynamic-import": false,
+  },
   logLevel: "info",
   sourcemap: prod ? false : "inline",
   treeShaking: true,
