@@ -36,6 +36,8 @@ export class PiChatView extends ItemView {
   private isStreaming = false
   private currentAssistantText = ''
   private currentToolCalls: Map<string, ToolCallInfo> = new Map()
+  private toolCallExpanded: Map<string, boolean> = new Map()
+  private toggledToolCalls: Set<string> = new Set()
 
   constructor(leaf: WorkspaceLeaf, plugin: ObsidianPiPlugin) {
     super(leaf)
@@ -245,26 +247,105 @@ export class PiChatView extends ItemView {
 
     // Render tool calls
     for (const [id, tc] of this.currentToolCalls) {
-      const toolEl = streamEl.createDiv('pi-chat-tool-call')
-      const header = toolEl.createDiv('pi-chat-tool-header')
-      const iconEl = header.createSpan('pi-chat-tool-icon')
-      setIcon(iconEl, 'wrench')
-      header.createSpan().setText(` ${tc.name}`)
-
-      if (tc.result !== undefined) {
-        toolEl.addClass('pi-chat-tool-done')
-        if (tc.isError) toolEl.addClass('pi-chat-tool-error')
-        const resultEl = toolEl.createDiv('pi-chat-tool-result')
-        const pre = resultEl.createEl('pre')
-        pre.setText(tc.result)
-      } else {
-        toolEl.addClass('pi-chat-tool-running')
-        const spinner = toolEl.createDiv('pi-chat-tool-spinner')
-        spinner.setText('⋯')
-      }
+      this.createToolCallEl(
+        streamEl,
+        tc,
+        id,
+        tc.result === undefined,
+      )
     }
 
     this.scrollToBottom()
+  }
+
+  private createToolCallEl(
+    parent: HTMLElement,
+    tc: ToolCallInfo,
+    id: string,
+    defaultExpanded: boolean,
+  ): HTMLElement {
+    const expanded = this.toggledToolCalls.has(id)
+      ? this.toolCallExpanded.get(id)!
+      : defaultExpanded
+
+    const toolEl = parent.createDiv('pi-chat-tool-call')
+    if (tc.isError) toolEl.addClass('pi-chat-tool-error')
+    if (expanded) toolEl.addClass('is-expanded')
+
+    const header = toolEl.createDiv('pi-chat-tool-header')
+    const iconEl = header.createSpan('pi-chat-tool-icon')
+    setIcon(iconEl, 'wrench')
+
+    const nameEl = header.createSpan('pi-chat-tool-name')
+    nameEl.setText(` ${tc.name}`)
+
+    const summary = this.extractToolResultSummary(tc)
+    if (summary) {
+      const summaryEl = header.createSpan('pi-chat-tool-summary')
+      summaryEl.setText(summary)
+    }
+
+    const toggleEl = header.createSpan('pi-chat-tool-toggle')
+    setIcon(toggleEl, expanded ? 'chevron-down' : 'chevron-right')
+
+    if (tc.result === undefined) {
+      toolEl.addClass('pi-chat-tool-running')
+      const spinner = header.createDiv('pi-chat-tool-spinner')
+      spinner.setText('⋯')
+    } else {
+      toolEl.addClass('pi-chat-tool-done')
+    }
+
+    let resultEl: HTMLElement | null = null
+    if (tc.result !== undefined) {
+      resultEl = toolEl.createDiv('pi-chat-tool-result')
+      const pre = resultEl.createEl('pre')
+      pre.setText(tc.result)
+      if (!expanded) resultEl.style.display = 'none'
+    }
+
+    header.addEventListener('click', () => {
+      const isExpanded = toolEl.hasClass('is-expanded')
+      if (isExpanded) {
+        toolEl.removeClass('is-expanded')
+        setIcon(toggleEl, 'chevron-right')
+        if (resultEl) resultEl.style.display = 'none'
+      } else {
+        toolEl.addClass('is-expanded')
+        setIcon(toggleEl, 'chevron-down')
+        if (resultEl) resultEl.style.display = ''
+      }
+      this.toggledToolCalls.add(id)
+      this.toolCallExpanded.set(id, !isExpanded)
+    })
+
+    return toolEl
+  }
+
+  private extractToolResultSummary(tc: ToolCallInfo): string | null {
+    if (!tc.result) return null
+    try {
+      const parsed = JSON.parse(tc.result)
+      if (parsed?.content?.text && typeof parsed.content.text === 'string') {
+        return this.truncateSummary(parsed.content.text)
+      }
+      if (Array.isArray(parsed?.content)) {
+        for (const block of parsed.content) {
+          if (block?.type === 'text' && typeof block.text === 'string') {
+            return this.truncateSummary(block.text)
+          }
+        }
+      }
+    } catch {
+      // Not JSON — ignore
+    }
+    return null
+  }
+
+  private truncateSummary(text: string, maxLen = 80): string {
+    const trimmed = text.trim().replace(/\s+/g, ' ')
+    if (trimmed.length <= maxLen) return trimmed
+    return trimmed.slice(0, maxLen - 1) + '…'
   }
 
   private async handleSend() {
@@ -294,7 +375,8 @@ export class PiChatView extends ItemView {
   private renderMessages() {
     this.messagesEl.empty()
 
-    for (const msg of this.messages) {
+    for (let i = 0; i < this.messages.length; i++) {
+      const msg = this.messages[i]
       const msgEl = this.messagesEl.createDiv(
         `pi-chat-message pi-chat-message-${msg.role}`,
       )
@@ -302,21 +384,16 @@ export class PiChatView extends ItemView {
       const textEl = msgEl.createDiv('pi-chat-message-text')
       this.renderMarkdown(textEl, msg.text)
 
-      // Render completed tool calls
+      // Render completed tool calls (collapsed by default)
       if (msg.toolCalls) {
-        for (const tc of msg.toolCalls) {
-          const toolEl = msgEl.createDiv('pi-chat-tool-call')
-          if (tc.isError) toolEl.addClass('pi-chat-tool-error')
-          const header = toolEl.createDiv('pi-chat-tool-header')
-          const iconEl = header.createSpan('pi-chat-tool-icon')
-          setIcon(iconEl, 'wrench')
-          header.createSpan().setText(` ${tc.name}`)
-
-          if (tc.result) {
-            const resultEl = toolEl.createDiv('pi-chat-tool-result')
-            const pre = resultEl.createEl('pre')
-            pre.setText(tc.result)
-          }
+        for (let j = 0; j < msg.toolCalls.length; j++) {
+          const tc = msg.toolCalls[j]
+          this.createToolCallEl(
+            msgEl,
+            tc,
+            `history-${i}-${j}`,
+            false,
+          )
         }
       }
     }

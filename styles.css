@@ -134,6 +134,37 @@
   background: var(--background-modifier-hover);
   color: var(--text-muted);
   gap: 4px;
+  cursor: pointer;
+}
+
+.pi-chat-tool-header:hover {
+  background: var(--background-modifier-border-hover);
+}
+
+.pi-chat-tool-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pi-chat-tool-toggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+.pi-chat-tool-summary {
+  margin-left: 6px;
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.pi-chat-tool-call.is-expanded .pi-chat-tool-summary {
+  display: none;
 }
 
 .pi-chat-tool-icon {
@@ -151,7 +182,7 @@
 }
 
 .pi-chat-tool-spinner {
-  margin-left: auto;
+  margin-left: 4px;
   animation: pi-chat-pulse 1.2s infinite;
 }
 
