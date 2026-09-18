@@ -1,4 +1,13 @@
-import { ItemView, MarkdownRenderer, WorkspaceLeaf, setIcon } from 'obsidian'
+import {
+  ItemView,
+  MarkdownRenderer,
+  WorkspaceLeaf,
+  setIcon,
+  TFile,
+  arrayBufferToBase64,
+  prepareFuzzySearch,
+  Notice,
+} from 'obsidian'
 import type ObsidianPiPlugin from './main'
 import {
   createAgentSession,
@@ -6,8 +15,20 @@ import {
   type AgentSession,
   type AgentSessionEvent,
 } from '@mariozechner/pi-coding-agent'
+import type { ImageContent } from '@mariozechner/pi-ai'
 import { join } from 'path'
 import { homedir } from 'os'
+import { InlineSuggest, type SuggestItem } from './inline-suggest'
+import {
+  classifyFile,
+  detectMention,
+  formatTextAttachment,
+  imageMimeFromExt,
+  rankMentions,
+  reconcileMentions,
+  replaceMention,
+  splitFileBlocks,
+} from './at-mention'
 
 export const VIEW_TYPE_PI_CHAT = 'pi-chat'
 
@@ -38,6 +59,15 @@ export class PiChatView extends ItemView {
   private currentToolCalls: Map<string, ToolCallInfo> = new Map()
   private toolCallExpanded: Map<string, boolean> = new Map()
   private toggledToolCalls: Set<string> = new Set()
+  private suggest!: InlineSuggest
+  private activeMention: { query: string; start: number } | null = null
+  private pendingAttachments: {
+    name: string
+    content?: string
+    token?: string
+    inline?: boolean
+    image?: ImageContent
+  }[] = []
 
   constructor(leaf: WorkspaceLeaf, plugin: ObsidianPiPlugin) {
     super(leaf)
@@ -84,6 +114,10 @@ export class PiChatView extends ItemView {
         spellcheck: 'false',
       },
     })
+    // @-mention file picker dropdown (anchored to the input area)
+    this.suggest = new InlineSuggest(inputArea)
+    this.suggest.onChoose = (item) => void this.chooseMention(item)
+
     this.sendBtn = inputArea.createEl('button', {
       cls: 'pi-chat-send',
     })
@@ -92,6 +126,32 @@ export class PiChatView extends ItemView {
     // ─── Event handlers ─────────────────────────────────────
     this.sendBtn.addEventListener('click', () => this.handleSend())
     this.inputEl.addEventListener('keydown', (e: KeyboardEvent) => {
+      // @-mention dropdown captures navigation keys while open
+      if (this.suggest.isOpen) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          this.suggest.moveSelection(1)
+          return
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          this.suggest.moveSelection(-1)
+          return
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          this.closeMentionSuggest()
+          return
+        }
+        if (e.key === 'Enter' || e.key === 'Tab') {
+          const item = this.suggest.current()
+          if (item) {
+            e.preventDefault()
+            void this.chooseMention(item)
+            return
+          }
+        }
+      }
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
         this.handleSend()
@@ -99,7 +159,13 @@ export class PiChatView extends ItemView {
     })
     this.inputEl.addEventListener('input', () => {
       this.inputEl.style.height = 'auto'
-      this.inputEl.style.height = Math.min(this.inputEl.scrollHeight, 200) + 'px'
+      this.inputEl.style.height =
+        Math.min(this.inputEl.scrollHeight, 200) + 'px'
+      this.updateMentionSuggest()
+      this.reconcileInlineMentions()
+    })
+    this.inputEl.addEventListener('blur', () => {
+      if (this.suggest.isOpen) this.closeMentionSuggest()
     })
 
     // Focus input on open and whenever the tab becomes active
@@ -350,17 +416,39 @@ export class PiChatView extends ItemView {
 
   private async handleSend() {
     const text = this.inputEl.value.trim()
-    if (!text || this.isStreaming || !this.session) return
+    const hasAttachments = this.pendingAttachments.length > 0
+    if ((!text && !hasAttachments) || this.isStreaming || !this.session) return
 
-    // Add user message to UI
-    this.messages.push({ role: 'user', text })
+    // Build full message with inline file attachments and collect images
+    let fullMessage = text
+    const images: ImageContent[] = []
+    for (const att of this.pendingAttachments) {
+      if (att.image) {
+        images.push(att.image)
+      } else if (att.content) {
+        fullMessage = fullMessage
+          ? fullMessage + '\n\n' + att.content
+          : att.content
+      }
+    }
+    if (!text && hasAttachments) {
+      fullMessage = `📎 ${this.pendingAttachments.map((a) => a.name).join(', ')}`
+    }
+
     this.inputEl.value = ''
     this.inputEl.style.height = 'auto'
+    this.pendingAttachments = []
+    this.closeMentionSuggest()
+
+    // Add user message to UI
+    this.messages.push({ role: 'user', text: fullMessage })
     this.renderMessages()
 
     // Send to Pi
     try {
-      await this.session.prompt(text)
+      const options: { images?: ImageContent[] } =
+        images.length > 0 ? { images } : {}
+      await this.session.prompt(fullMessage, options)
     } catch (err) {
       this.messages.push({
         role: 'system',
@@ -381,8 +469,12 @@ export class PiChatView extends ItemView {
         `pi-chat-message pi-chat-message-${msg.role}`,
       )
 
-      const textEl = msgEl.createDiv('pi-chat-message-text')
-      this.renderMarkdown(textEl, msg.text)
+      if (msg.role === 'user') {
+        this.renderUserText(msgEl, msg.text)
+      } else {
+        const textEl = msgEl.createDiv('pi-chat-message-text')
+        this.renderMarkdown(textEl, msg.text)
+      }
 
       // Render completed tool calls (collapsed by default)
       if (msg.toolCalls) {
@@ -401,9 +493,132 @@ export class PiChatView extends ItemView {
     this.scrollToBottom()
   }
 
+  private renderUserText(msgEl: HTMLElement, text: string) {
+    for (const seg of splitFileBlocks(text)) {
+      if (seg.type === 'text') {
+        const textEl = msgEl.createDiv('pi-chat-message-text')
+        this.renderMarkdown(textEl, seg.text)
+      } else {
+        const details = msgEl.createEl('details', {
+          cls: 'pi-chat-file-attachment',
+        })
+        details.createEl('summary', {
+          cls: 'pi-chat-file-summary',
+          text: seg.label,
+        })
+        details.createEl('pre', { cls: 'pi-chat-file-body' }).createEl('code', {
+          text: seg.body,
+        })
+      }
+    }
+  }
+
   private renderMarkdown(el: HTMLElement, text: string) {
     const sourcePath = this.app.workspace.getActiveFile()?.path ?? ''
     MarkdownRenderer.render(this.app, text, el, sourcePath, this)
+  }
+
+  // ─── @-mention file picker ───────────────────────────────────────────
+
+  private updateMentionSuggest(): void {
+    const cursor = this.inputEl.selectionStart ?? this.inputEl.value.length
+    const mention = detectMention(this.inputEl.value, cursor)
+    if (!mention) {
+      this.closeMentionSuggest()
+      return
+    }
+    this.activeMention = mention
+    const items = this.mentionItems(mention.query)
+    if (this.suggest.isOpen) this.suggest.update(items)
+    else this.suggest.show(items)
+  }
+
+  private mentionItems(query: string): SuggestItem[] {
+    const files = this.app.vault
+      .getFiles()
+      .map((f) => ({ path: f.path, mtime: f.stat.mtime }))
+    const matcher = query ? prepareFuzzySearch(query) : null
+    const score = (_q: string, path: string): number | null => {
+      if (!matcher) return 0
+      const result = matcher(path)
+      return result ? result.score : null
+    }
+    return rankMentions(files, query, score, 50).map((f) => ({
+      path: f.path,
+      display: f.path,
+    }))
+  }
+
+  private closeMentionSuggest(): void {
+    this.activeMention = null
+    this.suggest.close()
+  }
+
+  private async chooseMention(item: SuggestItem): Promise<void> {
+    const mention = this.activeMention
+    this.closeMentionSuggest()
+
+    const file = this.app.vault.getAbstractFileByPath(item.path)
+    if (!(file instanceof TFile)) return
+
+    const token = `@${file.path}`
+    if (mention) this.insertMentionText(mention, token)
+
+    try {
+      const base = { name: file.name, inline: true, token }
+      const kind = classifyFile(file.name)
+      if (kind === 'image') {
+        const data = arrayBufferToBase64(await this.app.vault.readBinary(file))
+        const mimeType = imageMimeFromExt(file.extension)
+        this.pendingAttachments.push({
+          ...base,
+          image: { type: 'image', data, mimeType },
+        })
+      } else if (kind === 'text') {
+        const content = await this.app.vault.read(file)
+        this.pendingAttachments.push({
+          ...base,
+          content: formatTextAttachment(file.path, content),
+        })
+      } else {
+        this.pendingAttachments.push({
+          ...base,
+          content: `[Attached file: ${file.name}]`,
+        })
+      }
+      this.updateSendButton()
+    } catch (e) {
+      new Notice(`Failed to attach ${file.name}: ${e}`)
+    }
+  }
+
+  private insertMentionText(
+    mention: { query: string; start: number },
+    token: string,
+  ): void {
+    const { value, caret } = replaceMention(
+      this.inputEl.value,
+      mention.start,
+      mention.query.length,
+      `${token} `,
+    )
+    this.inputEl.value = value
+    this.inputEl.setSelectionRange(caret, caret)
+    this.inputEl.style.height = 'auto'
+    this.inputEl.style.height =
+      Math.min(this.inputEl.scrollHeight, 200) + 'px'
+    this.updateSendButton()
+  }
+
+  private reconcileInlineMentions(): void {
+    const survivors = reconcileMentions(
+      this.inputEl.value,
+      this.pendingAttachments,
+    )
+    if (survivors.length !== this.pendingAttachments.length) {
+      this.pendingAttachments = survivors
+      this.updateSendButton()
+    }
   }
 
   private scrollToBottom() {
