@@ -24,6 +24,7 @@
   padding: 8px 12px;
   border-bottom: 1px solid var(--background-modifier-border);
   flex-shrink: 0;
+  gap: 8px;
 }
 
 .pi-chat-title {
@@ -32,9 +33,35 @@
   font-size: var(--font-ui-small);
 }
 
+.pi-chat-context {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin-right: auto;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--background-secondary);
+}
+
+.pi-chat-context.low {
+  color: var(--text-muted);
+}
+
+.pi-chat-context.medium {
+  color: var(--text-accent);
+}
+
+.pi-chat-context.high {
+  color: var(--text-error);
+  background: var(--background-modifier-error);
+}
+
 .pi-chat-status {
   font-size: var(--font-ui-smaller);
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
 }
 
 .pi-chat-status-busy {

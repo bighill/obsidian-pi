@@ -53,6 +53,8 @@ export class PiChatView extends ItemView {
   private inputEl!: HTMLTextAreaElement
   private sendBtn!: HTMLButtonElement
   private statusEl!: HTMLElement
+  private contextEl!: HTMLElement
+  private contextUpdateInterval: number | null = null
   private messages: ChatMessage[] = []
   private isStreaming = false
   private currentAssistantText = ''
@@ -98,6 +100,8 @@ export class PiChatView extends ItemView {
     const header = wrapper.createDiv('pi-chat-header')
     const titleEl = header.createDiv('pi-chat-title')
     titleEl.setText('Pi')
+    this.contextEl = header.createDiv('pi-chat-context')
+    this.contextEl.setText('')
     this.statusEl = header.createDiv('pi-chat-status')
     this.statusEl.setText('Not connected')
 
@@ -221,11 +225,48 @@ export class PiChatView extends ItemView {
       this.statusEl.setText(modelLabel)
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-ready')
+      this.startContextPoller()
     } catch (err) {
       console.error('obsidian-pi: initSession error:', err)
       this.statusEl.setText('Error: ' + (err instanceof Error ? err.message : String(err)))
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-error')
+    }
+  }
+
+  private startContextPoller(): void {
+    if (this.contextUpdateInterval) return
+    this.updateContextDisplay()
+    this.contextUpdateInterval = window.setInterval(() => {
+      this.updateContextDisplay()
+    }, 5000)
+  }
+
+  private updateContextDisplay(): void {
+    if (!this.session || !this.contextEl) return
+    const usage = this.session.getContextUsage()
+    if (!usage || usage.percent == null) {
+      this.contextEl.setText('')
+      this.contextEl.removeAttribute('title')
+      return
+    }
+    const pct = Math.round(usage.percent)
+    const tokens = usage.tokens ?? 0
+    this.contextEl.setText(`${pct}%`)
+    this.contextEl.setAttribute(
+      'title',
+      `${tokens.toLocaleString()} / ${usage.contextWindow.toLocaleString()} tokens`,
+    )
+    this.contextEl.removeClass('low', 'medium', 'high')
+    if (pct < 50) this.contextEl.addClass('low')
+    else if (pct < 80) this.contextEl.addClass('medium')
+    else this.contextEl.addClass('high')
+  }
+
+  private stopContextPoller(): void {
+    if (this.contextUpdateInterval) {
+      window.clearInterval(this.contextUpdateInterval)
+      this.contextUpdateInterval = null
     }
   }
 
@@ -636,6 +677,7 @@ export class PiChatView extends ItemView {
   }
 
   async onClose() {
+    this.stopContextPoller()
     this.unsubscribe?.()
     this.unsubscribe = null
     this.session = null
