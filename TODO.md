@@ -187,15 +187,15 @@
   - [x] Use SDK-provided `toolCallId` as the stable key when available
   - [x] Toggle state keyed by stable IDs
 
-### [ ] TICKET-016 — Improve status/context header UX
+### [x] TICKET-016 — Improve status/context header UX
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** Model name, context percentage, and status share limited header space; long model names truncate.
 - **Acceptance:**
-  - [ ] Model name, context usage, and status are each readable
-  - [ ] Consider tooltip with full model name / context details
-  - [ ] Busy/error states visually distinct
+  - [x] Model name, context usage, and status are each readable
+  - [x] Consider tooltip with full model name / context details
+  - [x] Busy/error states visually distinct
 
 ### [ ] TICKET-017 — Add source maps for production build
 - **Priority:** P2

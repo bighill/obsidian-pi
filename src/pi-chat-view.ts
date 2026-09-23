@@ -201,7 +201,9 @@ export class PiChatView extends ItemView {
   private async initSession() {
     try {
       this.statusEl.setText('Starting session…')
+      this.statusEl.setAttribute('title', '')
       this.statusEl.addClass('pi-chat-status-busy')
+      this.statusEl.removeClass('pi-chat-status-ready', 'pi-chat-status-error')
 
       const adapter = this.app.vault.adapter
       const cwd =
@@ -223,16 +225,18 @@ export class PiChatView extends ItemView {
 
       const modelLabel = session.model ? session.model.name : 'Ready'
       this.statusEl.setText(modelLabel)
+      this.statusEl.setAttribute('title', modelLabel)
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-ready')
+      this.statusEl.removeClass('pi-chat-status-error')
       this.retryBtn.addClass('is-hidden')
       this.restoreHistory()
       this.startContextPoller()
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
       console.error('obsidian-pi: initSession error:', err)
-      this.statusEl.setText(
-        'Error: ' + (err instanceof Error ? err.message : String(err)),
-      )
+      this.statusEl.setText('Error')
+      this.statusEl.setAttribute('title', message)
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-error')
       this.retryBtn.removeClass('is-hidden')
