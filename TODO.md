@@ -111,16 +111,16 @@
   - [ ] Handle non-macOS platforms and missing `FileSystemAdapter`
   - [ ] Add retry or user-visible error recovery when `initSession()` fails
 
-### [ ] TICKET-009 — Add unit tests for pure helper modules
+### [x] TICKET-009 — Add unit tests for pure helper modules
 - **Priority:** P1
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** No tests exist for `at-mention.ts` or `inline-suggest.ts` logic.
 - **Acceptance:**
-  - [ ] Test runner configured (Vitest or Jest)
-  - [ ] Tests for `detectMention`, `replaceMention`, `reconcileMentions`, `rankMentions`, `splitFileBlocks`
-  - [ ] Tests for `InlineSuggest` selection/movement logic
-  - [ ] `npm test` script added and passing
+  - [x] Test runner configured (Vitest or Jest)
+  - [x] Tests for `detectMention`, `replaceMention`, `reconcileMentions`, `rankMentions`, `splitFileBlocks`
+  - [x] Tests for `InlineSuggest` selection/movement logic
+  - [x] `npm test` script added and passing
 
 ### [ ] TICKET-010 — Add CI with GitHub Actions
 - **Priority:** P1
