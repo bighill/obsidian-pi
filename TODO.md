@@ -31,14 +31,15 @@
   - [x] No `as any` workarounds for core SDK calls
   - [x] `DataAdapter` cast is type-safe (`instanceof FileSystemAdapter`)
 
-### [ ] TICKET-002 — Resolve security vulnerabilities from `npm audit`
+### [x] TICKET-002 — Resolve security vulnerabilities from `npm audit`
 - **Priority:** P0
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** 6 vulnerabilities (3 moderate, 3 high) in `@anthropic-ai/sdk`, `extract-zip`, and `fast-uri`.
 - **Acceptance:**
-  - [ ] `npm audit` reports 0 high/moderate severity issues, or each remaining issue is documented with a risk acceptance note
-  - [ ] `@mariozechner/pi-coding-agent` upgraded to latest compatible version and tested
+  - [x] `npm audit` reports 0 high/moderate severity issues, or each remaining issue is documented with a risk acceptance note
+  - [x] `@mariozechner/pi-coding-agent` upgraded to latest compatible version and tested
+- **Notes:** After upgrading to `0.73.1` (latest `@mariozechner/pi-coding-agent`), 2 residual high-severity findings remain. Both are upstream SDK/TUI issues not exercised by this plugin and are documented in `docs/security-notes.md`.
 
 ### [ ] TICKET-003 — Add plugin settings UI
 - **Priority:** P0
