@@ -1,6 +1,6 @@
 # Obsidian Pi Plugin — Backlog
 
-> Last updated: 2026-09-22  
+> Last updated: 2026-09-23  
 > Generated from `AUDIT.md`. Use ticket numbers in branch names and commit messages.
 
 ---
