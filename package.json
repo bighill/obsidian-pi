@@ -28,6 +28,9 @@
   ],
   "author": "bighill",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.19.0"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.6",
