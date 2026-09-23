@@ -76,6 +76,31 @@
   color: var(--text-error);
 }
 
+.pi-chat-retry {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  color: var(--text-error);
+  cursor: pointer;
+}
+
+.pi-chat-retry.is-hidden {
+  display: none;
+}
+
+.pi-chat-retry:hover {
+  background: var(--background-modifier-hover);
+}
+
+.pi-chat-retry svg {
+  width: 14px;
+  height: 14px;
+}
+
 /* ─── Messages ──────────────────────────────────────────────── */
 
 .pi-chat-messages {

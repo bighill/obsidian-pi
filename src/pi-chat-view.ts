@@ -62,6 +62,7 @@ export class PiChatView extends ItemView {
   private inputEl!: HTMLTextAreaElement
   private sendBtn!: HTMLButtonElement
   private statusEl!: HTMLElement
+  private retryBtn!: HTMLElement
   private contextEl!: HTMLElement
   private contextUpdateInterval: number | null = null
   private messages: ChatMessage[] = []
@@ -113,6 +114,13 @@ export class PiChatView extends ItemView {
     this.contextEl.setText('')
     this.statusEl = header.createDiv('pi-chat-status')
     this.statusEl.setText('Not connected')
+    this.retryBtn = header.createDiv('pi-chat-retry')
+    setIcon(this.retryBtn, 'refresh-cw')
+    this.retryBtn.setAttribute('aria-label', 'Retry connection')
+    this.retryBtn.addClass('is-hidden')
+    this.retryBtn.addEventListener('click', () => {
+      void this.restartSession()
+    })
 
     // Messages container
     this.messagesEl = wrapper.createDiv('pi-chat-messages')
@@ -263,12 +271,16 @@ export class PiChatView extends ItemView {
       this.statusEl.setText(modelLabel)
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-ready')
+      this.retryBtn.addClass('is-hidden')
       this.startContextPoller()
     } catch (err) {
       console.error('obsidian-pi: initSession error:', err)
-      this.statusEl.setText('Error: ' + (err instanceof Error ? err.message : String(err)))
+      this.statusEl.setText(
+        'Error: ' + (err instanceof Error ? err.message : String(err)),
+      )
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-error')
+      this.retryBtn.removeClass('is-hidden')
     }
   }
 
@@ -723,6 +735,7 @@ export class PiChatView extends ItemView {
     this.currentToolCalls.clear()
     this.isStreaming = false
     this.updateSendButton()
+    this.retryBtn?.addClass('is-hidden')
     await this.initSession()
   }
 

@@ -100,16 +100,16 @@
   - [ ] Extract message/tool rendering into `src/message-renderer.ts`
   - [ ] `PiChatView` remains focused on view lifecycle and user input only
 
-### [ ] TICKET-008 — Improve SDK runtime initialization reliability
+### [x] TICKET-008 — Improve SDK runtime initialization reliability
 - **Priority:** P1
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** The esbuild banner polyfills `import.meta.url`, mutates `process.env.PATH`, and sets `PI_OFFLINE`/`PI_PACKAGE_DIR` using brittle macOS path assumptions.
 - **Acceptance:**
-  - [ ] Stop mutating global `process.env` from the banner
-  - [ ] Move environment/path setup into a runtime helper scoped to the module
-  - [ ] Handle non-macOS platforms and missing `FileSystemAdapter`
-  - [ ] Add retry or user-visible error recovery when `initSession()` fails
+  - [x] Stop mutating global `process.env` from the banner
+  - [x] Move environment/path setup into a runtime helper scoped to the module
+  - [x] Handle non-macOS platforms and missing `FileSystemAdapter`
+  - [x] Add retry or user-visible error recovery when `initSession()` fails
 
 ### [x] TICKET-009 — Add unit tests for pure helper modules
 - **Priority:** P1

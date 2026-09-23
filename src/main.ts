@@ -1,3 +1,6 @@
+// Configure Pi SDK runtime environment before any SDK modules are evaluated.
+import './sdk-runtime-init'
+
 import { Plugin, WorkspaceLeaf } from 'obsidian'
 import { PiChatView, VIEW_TYPE_PI_CHAT } from './pi-chat-view'
 import { PiPluginSettingTab } from './settings-tab'
