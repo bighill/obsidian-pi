@@ -219,13 +219,13 @@
   - [ ] Pin to stable `^5.5.0` or latest stable 5.x
   - [ ] `npm run typecheck` still passes
 
-### [ ] TICKET-019 — Upgrade esbuild to latest patch
+### [x] TICKET-019 — Upgrade esbuild to latest patch
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** `esbuild@0.28.1` has patch `0.28.2` available.
 - **Acceptance:**
-  - [ ] Upgrade and verify build output
+  - [x] Upgrade and verify build output
 
 ### [ ] TICKET-020 — Add linting and formatting
 - **Priority:** P2
