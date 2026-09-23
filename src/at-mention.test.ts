@@ -76,9 +76,7 @@ describe('rankMentions', () => {
 
   it('filters by score and sorts by score then recency', () => {
     const score = (_q: string, path: string) => (path.includes('b') ? 5 : null)
-    expect(rankMentions(files, 'b', score, 10)).toEqual([
-      { path: 'a/b.md', mtime: 100 },
-    ])
+    expect(rankMentions(files, 'b', score, 10)).toEqual([{ path: 'a/b.md', mtime: 100 }])
   })
 })
 
@@ -93,9 +91,7 @@ describe('splitFileBlocks', () => {
   })
 
   it('returns plain text when there are no file blocks', () => {
-    expect(splitFileBlocks('plain text')).toEqual([
-      { type: 'text', text: 'plain text' },
-    ])
+    expect(splitFileBlocks('plain text')).toEqual([{ type: 'text', text: 'plain text' }])
   })
 })
 

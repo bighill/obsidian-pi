@@ -20,17 +20,15 @@ export class PiPluginSettingTab extends PluginSettingTab {
         'Persist conversation history across Obsidian restarts. History is stored in the plugin data file.',
       )
       .addToggle((toggle) => {
-        toggle
-          .setValue(this.plugin.settings.saveHistory)
-          .onChange(async (value) => {
-            this.plugin.settings.saveHistory = value
-            await this.plugin.saveSettings()
-            if (value) {
-              await this.plugin.saveCurrentHistory()
-            } else {
-              await this.plugin.clearHistory()
-            }
-          })
+        toggle.setValue(this.plugin.settings.saveHistory).onChange(async (value) => {
+          this.plugin.settings.saveHistory = value
+          await this.plugin.saveSettings()
+          if (value) {
+            await this.plugin.saveCurrentHistory()
+          } else {
+            await this.plugin.clearHistory()
+          }
+        })
       })
 
     new Setting(containerEl)
@@ -45,9 +43,7 @@ export class PiPluginSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             const trimmed = value.trim()
             if (trimmed && !this.isValidDir(trimmed)) {
-              new Notice(
-                `Working directory is not a valid directory: ${trimmed}`,
-              )
+              new Notice(`Working directory is not a valid directory: ${trimmed}`)
               text.inputEl.addClass('pi-setting-invalid')
               return
             }
@@ -88,8 +84,7 @@ export class PiPluginSettingTab extends PluginSettingTab {
           .addOption('xhigh', 'Maximum')
           .setValue(this.plugin.settings.thinkingLevel)
           .onChange(async (value) => {
-            this.plugin.settings.thinkingLevel =
-              value as typeof this.plugin.settings.thinkingLevel
+            this.plugin.settings.thinkingLevel = value as typeof this.plugin.settings.thinkingLevel
             await this.plugin.saveSettings()
             await this.plugin.restartChatSessions()
           })

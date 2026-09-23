@@ -31,10 +31,7 @@ export default class ObsidianPiPlugin extends Plugin {
   async onload() {
     await this.loadSettings()
 
-    this.registerView(
-      VIEW_TYPE_PI_CHAT,
-      (leaf: WorkspaceLeaf) => new PiChatView(leaf, this),
-    )
+    this.registerView(VIEW_TYPE_PI_CHAT, (leaf: WorkspaceLeaf) => new PiChatView(leaf, this))
 
     this.addSettingTab(new PiPluginSettingTab(this.app, this))
 

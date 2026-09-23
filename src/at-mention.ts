@@ -1,15 +1,12 @@
 /** File-type buckets the chat input treats differently. */
 export type FileKind = 'image' | 'text' | 'binary'
 
-const TEXT_EXT =
-  /\.(md|txt|json|csv|yaml|yml|js|ts|py|html|css|xml|toml|ini|sh|log)$/i
+const TEXT_EXT = /\.(md|txt|json|csv|yaml|yml|js|ts|py|html|css|xml|toml|ini|sh|log)$/i
 const IMAGE_EXT = /\.(png|jpe?g|gif|webp|svg|bmp|avif)$/i
 
 /** Clip text content to `max` chars, appending a marker when clipped. */
 export function truncate(content: string, max = 10000): string {
-  return content.length > max
-    ? content.slice(0, max) + '\n...(truncated)'
-    : content
+  return content.length > max ? content.slice(0, max) + '\n...(truncated)' : content
 }
 
 /** Wrap text-file content in a fenced block under a `File:` header. */
@@ -21,11 +18,7 @@ export function wrapTextContent(label: string, content: string): string {
  * Build a text-file attachment with a metadata header: the vault-relative
  * label, original line count, and a truncation note when the body was clipped.
  */
-export function formatTextAttachment(
-  label: string,
-  content: string,
-  max = 40000,
-): string {
+export function formatTextAttachment(label: string, content: string, max = 40000): string {
   const lines = content.split('\n').length
   const clipped = content.length > max
   const meta = `${lines} line${lines === 1 ? '' : 's'}${clipped ? `, truncated to ${max} chars` : ''}`
@@ -34,8 +27,7 @@ export function formatTextAttachment(
 
 /** A parsed chunk of a stored message: plain text, or a file attachment block. */
 export type MessageSegment =
-  | { type: 'text'; text: string }
-  | { type: 'file'; label: string; body: string }
+  { type: 'text'; text: string } | { type: 'file'; label: string; body: string }
 
 /**
  * Split a stored message into text and file-attachment segments, inverting
@@ -119,27 +111,20 @@ export function replaceMention(
  * Reconcile inline @-mention attachments against the textarea text: keep an
  * inline attachment only while its exact `@<path>` token is still present.
  */
-export function reconcileMentions<
-  T extends { inline?: boolean; token?: string },
->(value: string, attachments: T[]): T[] {
-  return attachments.filter(
-    (a) => !(a.inline && a.token && !value.includes(a.token)),
-  )
+export function reconcileMentions<T extends { inline?: boolean; token?: string }>(
+  value: string,
+  attachments: T[],
+): T[] {
+  return attachments.filter((a) => !(a.inline && a.token && !value.includes(a.token)))
 }
 
 /** Remove attachment tokens from `text` so attachments don't render twice. */
-export function stripInlineTokens(
-  text: string,
-  attachments: { token?: string }[],
-): string {
+export function stripInlineTokens(text: string, attachments: { token?: string }[]): string {
   let out = text
   for (const att of attachments) {
     if (!att.token) continue
     out = out.replace(
-      new RegExp(
-        att.token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*',
-        'g',
-      ),
+      new RegExp(att.token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*', 'g'),
       ' ',
     )
   }

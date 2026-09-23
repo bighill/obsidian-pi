@@ -41,18 +41,12 @@ export class MessageRenderer {
   }
 
   /** Render the full message history into `container`. */
-  renderMessages(
-    container: HTMLElement,
-    messages: ChatMessage[],
-    state: ToolState,
-  ): void {
+  renderMessages(container: HTMLElement, messages: ChatMessage[], state: ToolState): void {
     container.empty()
 
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i]
-      const msgEl = container.createDiv(
-        `pi-chat-message pi-chat-message-${msg.role}`,
-      )
+      const msgEl = container.createDiv(`pi-chat-message pi-chat-message-${msg.role}`)
 
       if (msg.role === 'user') {
         if (msg.attachments && msg.attachments.length > 0) {
@@ -91,13 +85,9 @@ export class MessageRenderer {
     toolCalls: Map<string, ToolCallInfo>,
     state: ToolState,
   ): HTMLElement {
-    let streamEl = container.querySelector(
-      '.pi-chat-streaming',
-    ) as HTMLElement | null
+    let streamEl = container.querySelector('.pi-chat-streaming') as HTMLElement | null
     if (!streamEl) {
-      streamEl = container.createDiv(
-        'pi-chat-message pi-chat-message-assistant pi-chat-streaming',
-      )
+      streamEl = container.createDiv('pi-chat-message pi-chat-message-assistant pi-chat-streaming')
     }
     streamEl.empty()
 
@@ -133,10 +123,7 @@ export class MessageRenderer {
     }
   }
 
-  private renderUserAttachments(
-    msgEl: HTMLElement,
-    attachments: ChatAttachment[],
-  ): void {
+  private renderUserAttachments(msgEl: HTMLElement, attachments: ChatAttachment[]): void {
     for (const att of attachments) {
       if (att.image) {
         const labelEl = msgEl.createDiv('pi-chat-attachment-label')
@@ -176,9 +163,7 @@ export class MessageRenderer {
     defaultExpanded: boolean,
     state: ToolState,
   ): HTMLElement {
-    const expanded = state.toggled.has(id)
-      ? state.expanded.get(id)!
-      : defaultExpanded
+    const expanded = state.toggled.has(id) ? state.expanded.get(id)! : defaultExpanded
 
     const toolEl = parent.createDiv('pi-chat-tool-call')
     if (tc.isError) toolEl.addClass('pi-chat-tool-error')

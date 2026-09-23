@@ -33,8 +33,7 @@ export function inferPiPackageDir(): string | undefined {
     if (
       adapter &&
       typeof adapter === 'object' &&
-      typeof (adapter as { getBasePath?: () => string }).getBasePath ===
-        'function'
+      typeof (adapter as { getBasePath?: () => string }).getBasePath === 'function'
     ) {
       return `${(adapter as { getBasePath: () => string }).getBasePath()}/.obsidian/plugins/obsidian-pi`
     }

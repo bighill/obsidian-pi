@@ -63,16 +63,10 @@ polyfill(
   },
 )
 
-polyfill(
-  'createSpan',
-  function (
-    this: HTMLElement,
-    attrs?: { cls?: string; text?: string },
-  ) {
-    const el = document.createElement('span')
-    if (attrs?.cls) el.classList.add(...attrs.cls.split(' ').filter(Boolean))
-    if (attrs?.text) el.textContent = attrs.text
-    this.appendChild(el)
-    return el
-  },
-)
+polyfill('createSpan', function (this: HTMLElement, attrs?: { cls?: string; text?: string }) {
+  const el = document.createElement('span')
+  if (attrs?.cls) el.classList.add(...attrs.cls.split(' ').filter(Boolean))
+  if (attrs?.text) el.textContent = attrs.text
+  this.appendChild(el)
+  return el
+})

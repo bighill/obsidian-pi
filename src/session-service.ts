@@ -39,9 +39,7 @@ export class PiSessionService {
     const resourceLoader = new DefaultResourceLoader({
       cwd: options.cwd,
       agentDir: options.agentDir,
-      appendSystemPrompt: [
-        `Current timestamp: ${new Date().toISOString()}`,
-      ],
+      appendSystemPrompt: [`Current timestamp: ${new Date().toISOString()}`],
     })
     await resourceLoader.reload()
 
@@ -61,9 +59,7 @@ export class PiSessionService {
       if (colonIndex > 0 && colonIndex < modelSetting.length - 1) {
         const provider = modelSetting.slice(0, colonIndex)
         const modelId = modelSetting.slice(colonIndex + 1)
-        const authStorage = AuthStorage.create(
-          join(options.agentDir, 'auth.json'),
-        )
+        const authStorage = AuthStorage.create(join(options.agentDir, 'auth.json'))
         const modelRegistry = ModelRegistry.create(
           authStorage,
           join(options.agentDir, 'models.json'),
@@ -75,9 +71,7 @@ export class PiSessionService {
           throw new Error(`Model not found: ${modelSetting}`)
         }
       } else {
-        throw new Error(
-          `Model must be in "provider:modelId" format: ${modelSetting}`,
-        )
+        throw new Error(`Model must be in "provider:modelId" format: ${modelSetting}`)
       }
     }
 

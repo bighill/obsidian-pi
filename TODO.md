@@ -19,6 +19,7 @@
 ## Release Blockers
 
 ### [x] TICKET-001 — Fix TypeScript compilation
+
 - **Priority:** P0
 - **Status:** Done
 - **Owner:** unassigned
@@ -32,6 +33,7 @@
   - [x] `DataAdapter` cast is type-safe (`instanceof FileSystemAdapter`)
 
 ### [x] TICKET-002 — Resolve security vulnerabilities from `npm audit`
+
 - **Priority:** P0
 - **Status:** Done
 - **Owner:** unassigned
@@ -42,6 +44,7 @@
 - **Notes:** After upgrading to `0.73.1` (latest `@mariozechner/pi-coding-agent`), 2 residual high-severity findings remain. Both are upstream SDK/TUI issues not exercised by this plugin and are documented in `docs/security-notes.md`.
 
 ### [x] TICKET-003 — Add plugin settings UI
+
 - **Priority:** P0
 - **Status:** Done
 - **Owner:** unassigned
@@ -55,6 +58,7 @@
   - [x] Changes reflect immediately in an active chat session
 
 ### [x] TICKET-004 — Write README.md
+
 - **Priority:** P0
 - **Status:** Done
 - **Owner:** unassigned
@@ -67,6 +71,7 @@
   - [x] Minimum Obsidian version and platform support
 
 ### [x] TICKET-005 — Add LICENSE file
+
 - **Priority:** P0
 - **Status:** Done
 - **Owner:** unassigned
@@ -79,6 +84,7 @@
 ## High Priority
 
 ### [x] TICKET-006 — Reduce production bundle size
+
 - **Priority:** P1
 - **Status:** Done
 - **Owner:** unassigned
@@ -90,6 +96,7 @@
   - [x] Target bundle size documented (e.g., < 1 MB compressed)
 
 ### [x] TICKET-007 — Refactor `pi-chat-view.ts` into smaller modules
+
 - **Priority:** P1
 - **Status:** Done
 - **Owner:** unassigned
@@ -101,6 +108,7 @@
   - [x] `PiChatView` remains focused on view lifecycle and user input only
 
 ### [x] TICKET-008 — Improve SDK runtime initialization reliability
+
 - **Priority:** P1
 - **Status:** Done
 - **Owner:** unassigned
@@ -112,6 +120,7 @@
   - [x] Add retry or user-visible error recovery when `initSession()` fails
 
 ### [x] TICKET-009 — Add unit tests for pure helper modules
+
 - **Priority:** P1
 - **Status:** Done
 - **Owner:** unassigned
@@ -123,6 +132,7 @@
   - [x] `npm test` script added and passing
 
 ### [x] TICKET-010 — Add CI with GitHub Actions
+
 - **Priority:** P1
 - **Status:** Done
 - **Owner:** unassigned
@@ -139,6 +149,7 @@
 ## Medium Priority
 
 ### [x] TICKET-011 — Persist chat history
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -150,6 +161,7 @@
   - [x] User can clear history from the UI
 
 ### [x] TICKET-012 — Add cancel/stop button during agent turns
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -160,6 +172,7 @@
   - [x] UI returns to idle state safely
 
 ### [x] TICKET-013 — Use Obsidian lifecycle APIs for DOM events
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -169,6 +182,7 @@
   - [x] Ensure listeners are cleaned up on `onClose`
 
 ### [x] TICKET-014 — Harden file attachment handling
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -179,6 +193,7 @@
   - [x] Async file reading does not block UI for large files
 
 ### [x] TICKET-015 — Improve tool-call rendering identity
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -188,6 +203,7 @@
   - [x] Toggle state keyed by stable IDs
 
 ### [x] TICKET-016 — Improve status/context header UX
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -198,6 +214,7 @@
   - [x] Busy/error states visually distinct
 
 ### [x] TICKET-017 — Add source maps for production build
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -211,6 +228,7 @@
 ## Low Priority / Polish
 
 ### [x] TICKET-018 — Upgrade TypeScript to stable release
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -220,6 +238,7 @@
   - [x] `npm run typecheck` still passes
 
 ### [x] TICKET-019 — Upgrade esbuild to latest patch
+
 - **Priority:** P2
 - **Status:** Done
 - **Owner:** unassigned
@@ -227,18 +246,20 @@
 - **Acceptance:**
   - [x] Upgrade and verify build output
 
-### [ ] TICKET-020 — Add linting and formatting
+### [x] TICKET-020 — Add linting and formatting
+
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** No ESLint or Prettier configuration exists.
 - **Acceptance:**
-  - [ ] ESLint configured for TypeScript/Obsidian
-  - [ ] Prettier configured
-  - [ ] `npm run lint` and `npm run format` scripts added
-  - [ ] CI runs lint
+  - [x] ESLint configured for TypeScript/Obsidian
+  - [x] Prettier configured
+  - [x] `npm run lint` and `npm run format` scripts added
+  - [x] CI runs lint
 
 ### [ ] TICKET-021 — Add `.npmignore` or refine files list
+
 - **Priority:** P2
 - **Status:** Open
 - **Owner:** unassigned
@@ -248,6 +269,7 @@
   - [ ] Add `.npmignore` or update `package.json` `files`
 
 ### [ ] TICKET-022 — Document `import.meta.url` polyfill rationale
+
 - **Priority:** P2
 - **Status:** Open
 - **Owner:** unassigned

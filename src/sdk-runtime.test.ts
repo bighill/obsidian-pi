@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import {
-  buildPath,
-  computeSdkRuntimeEnv,
-  inferPiPackageDir,
-} from './sdk-runtime'
+import { buildPath, computeSdkRuntimeEnv, inferPiPackageDir } from './sdk-runtime'
 
 describe('sdk-runtime', () => {
   const originalEnv = { ...process.env }
@@ -19,9 +15,7 @@ describe('sdk-runtime', () => {
 
   describe('inferPiPackageDir', () => {
     it('falls back to cwd-based path when no Obsidian app global is present', () => {
-      expect(inferPiPackageDir()).toBe(
-        `${process.cwd()}/.obsidian/plugins/obsidian-pi`,
-      )
+      expect(inferPiPackageDir()).toBe(`${process.cwd()}/.obsidian/plugins/obsidian-pi`)
     })
 
     it('uses global app.vault.adapter.getBasePath when available', () => {
@@ -35,9 +29,7 @@ describe('sdk-runtime', () => {
       const original = (globalThis as { app?: typeof appMock }).app
       ;(globalThis as { app?: typeof appMock }).app = appMock
       try {
-        expect(inferPiPackageDir()).toBe(
-          '/my/vault/.obsidian/plugins/obsidian-pi',
-        )
+        expect(inferPiPackageDir()).toBe('/my/vault/.obsidian/plugins/obsidian-pi')
       } finally {
         ;(globalThis as { app?: typeof appMock }).app = original
       }

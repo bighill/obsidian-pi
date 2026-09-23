@@ -1,7 +1,7 @@
 {
   "inputs": {
     "src/sdk-runtime.ts": {
-      "bytes": 3593,
+      "bytes": 3585,
       "imports": [
         {
           "path": "os",
@@ -23,17 +23,17 @@
       "format": "esm"
     },
     "src/inline-suggest.ts": {
-      "bytes": 3138,
+      "bytes": 3119,
       "imports": [],
       "format": "esm"
     },
     "src/at-mention.ts": {
-      "bytes": 5268,
+      "bytes": 5661,
       "imports": [],
       "format": "esm"
     },
     "src/attachments.ts": {
-      "bytes": 1491,
+      "bytes": 2131,
       "imports": [
         {
           "path": "obsidian",
@@ -49,7 +49,7 @@
       "format": "esm"
     },
     "src/message-renderer.ts": {
-      "bytes": 6547,
+      "bytes": 7713,
       "imports": [
         {
           "path": "obsidian",
@@ -79403,7 +79403,7 @@
       "format": "esm"
     },
     "src/session-service.ts": {
-      "bytes": 2925,
+      "bytes": 2866,
       "imports": [
         {
           "path": "node_modules/@mariozechner/pi-coding-agent/dist/index.js",
@@ -79419,7 +79419,7 @@
       "format": "esm"
     },
     "src/pi-chat-view.ts": {
-      "bytes": 15825,
+      "bytes": 19054,
       "imports": [
         {
           "path": "obsidian",
@@ -79470,7 +79470,7 @@
       "format": "esm"
     },
     "src/settings-tab.ts": {
-      "bytes": 2784,
+      "bytes": 3317,
       "imports": [
         {
           "path": "obsidian",
@@ -79486,7 +79486,7 @@
       "format": "esm"
     },
     "src/main.ts": {
-      "bytes": 1909,
+      "bytes": 2771,
       "imports": [
         {
           "path": "src/sdk-runtime-init.ts",
@@ -79513,6 +79513,12 @@
     }
   },
   "outputs": {
+    "main.js.map": {
+      "imports": [],
+      "exports": [],
+      "inputs": {},
+      "bytes": 7949204
+    },
     "main.js": {
       "imports": [
         {
@@ -87362,7 +87368,7 @@
           "bytesInOutput": 3144
         },
         "src/main.ts": {
-          "bytesInOutput": 926
+          "bytesInOutput": 1380
         },
         "src/sdk-runtime.ts": {
           "bytesInOutput": 1159
@@ -87371,19 +87377,19 @@
           "bytesInOutput": 11
         },
         "src/pi-chat-view.ts": {
-          "bytesInOutput": 8662
+          "bytesInOutput": 11055
         },
         "src/inline-suggest.ts": {
           "bytesInOutput": 1578
         },
         "src/at-mention.ts": {
-          "bytesInOutput": 1592
+          "bytesInOutput": 1766
         },
         "src/attachments.ts": {
-          "bytesInOutput": 455
+          "bytesInOutput": 673
         },
         "src/message-renderer.ts": {
-          "bytesInOutput": 2876
+          "bytesInOutput": 3601
         },
         "node_modules/@mariozechner/pi-coding-agent/dist/index.js": {
           "bytesInOutput": 3356
@@ -90047,10 +90053,10 @@
           "bytesInOutput": 936
         },
         "src/settings-tab.ts": {
-          "bytesInOutput": 1672
+          "bytesInOutput": 2052
         }
       },
-      "bytes": 7055526
+      "bytes": 7059870
     }
   }
 }

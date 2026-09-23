@@ -1,9 +1,5 @@
 import { Notice, TFile, Vault, arrayBufferToBase64 } from 'obsidian'
-import {
-  classifyFile,
-  formatTextAttachment,
-  imageMimeFromExt,
-} from './at-mention'
+import { classifyFile, formatTextAttachment, imageMimeFromExt } from './at-mention'
 
 /** Maximum bytes read for a single attachment (2 MB). Larger files are attached by name only. */
 export const MAX_ATTACHMENT_BYTES = 2 * 1024 * 1024

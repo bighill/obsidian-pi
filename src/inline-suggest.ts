@@ -51,10 +51,7 @@ export class InlineSuggest {
 
   update(items: SuggestItem[]): void {
     this.items = items
-    this.selectedIndex = Math.min(
-      this.selectedIndex,
-      Math.max(0, items.length - 1),
-    )
+    this.selectedIndex = Math.min(this.selectedIndex, Math.max(0, items.length - 1))
     this.render()
   }
 

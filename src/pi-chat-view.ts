@@ -177,8 +177,7 @@ export class PiChatView extends ItemView {
     })
     this.registerDomEvent(this.inputEl, 'input', () => {
       this.inputEl.style.height = 'auto'
-      this.inputEl.style.height =
-        Math.min(this.inputEl.scrollHeight, 200) + 'px'
+      this.inputEl.style.height = Math.min(this.inputEl.scrollHeight, 200) + 'px'
       this.updateMentionSuggest()
       this.reconcileInlineMentions()
     })
@@ -187,11 +186,13 @@ export class PiChatView extends ItemView {
     })
 
     // Focus input on open and whenever the tab becomes active
-    this.registerEvent(this.app.workspace.on('active-leaf-change', (leaf) => {
-      if (leaf === this.leaf) {
-        this.inputEl.focus()
-      }
-    }))
+    this.registerEvent(
+      this.app.workspace.on('active-leaf-change', (leaf) => {
+        if (leaf === this.leaf) {
+          this.inputEl.focus()
+        }
+      }),
+    )
     this.inputEl.focus()
 
     // ─── Init session ────────────────────────────────────────
@@ -208,9 +209,7 @@ export class PiChatView extends ItemView {
       const adapter = this.app.vault.adapter
       const cwd =
         this.plugin.settings.workingDir ||
-        (adapter instanceof FileSystemAdapter
-          ? adapter.getBasePath()
-          : process.cwd())
+        (adapter instanceof FileSystemAdapter ? adapter.getBasePath() : process.cwd())
       const agentDir = join(homedir(), '.pi', 'agent')
 
       const session = await this.sessionService.start(
@@ -285,11 +284,7 @@ export class PiChatView extends ItemView {
     const saved = this.plugin.settings.history
     if (saved && saved.length > 0) {
       this.messages = JSON.parse(JSON.stringify(saved))
-      this.renderer.renderMessages(
-        this.messagesEl,
-        this.messages,
-        this.toolState,
-      )
+      this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
       this.updateClearButton()
     }
   }
@@ -380,9 +375,10 @@ export class PiChatView extends ItemView {
 
       case 'turn_end': {
         // Finalize the assistant message
-        const toolCalls = Array.from(this.currentToolCalls.entries()).map(
-          ([id, tc]) => ({ ...tc, id }),
-        )
+        const toolCalls = Array.from(this.currentToolCalls.entries()).map(([id, tc]) => ({
+          ...tc,
+          id,
+        }))
         this.messages.push({
           role: 'assistant',
           text: this.currentAssistantText,
@@ -392,11 +388,7 @@ export class PiChatView extends ItemView {
         this.currentToolCalls.clear()
         this.isStreaming = false
         this.updateSendButton()
-        this.renderer.renderMessages(
-          this.messagesEl,
-          this.messages,
-          this.toolState,
-        )
+        this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
         this.updateClearButton()
         this.persistHistory().catch((err) => {
           console.error('obsidian-pi: failed to persist history:', err)
@@ -429,9 +421,7 @@ export class PiChatView extends ItemView {
       if (att.image) {
         images.push(att.image)
       } else if (att.content) {
-        fullMessage = fullMessage
-          ? fullMessage + '\n\n' + att.content
-          : att.content
+        fullMessage = fullMessage ? fullMessage + '\n\n' + att.content : att.content
       }
     }
     if (!text && hasAttachments) {
@@ -440,15 +430,11 @@ export class PiChatView extends ItemView {
 
     const displayText =
       stripInlineTokens(text, this.pendingAttachments) ||
-      (hasAttachments
-        ? `📎 ${this.pendingAttachments.map((a) => a.name).join(', ')}`
-        : '')
+      (hasAttachments ? `📎 ${this.pendingAttachments.map((a) => a.name).join(', ')}` : '')
 
     this.inputEl.value = ''
     this.inputEl.style.height = 'auto'
-    const sentAttachments: ChatAttachment[] = this.pendingAttachments.map(
-      (att) => ({ ...att }),
-    )
+    const sentAttachments: ChatAttachment[] = this.pendingAttachments.map((att) => ({ ...att }))
     this.pendingAttachments = []
     this.closeMentionSuggest()
 
@@ -458,29 +444,20 @@ export class PiChatView extends ItemView {
       text: displayText,
       attachments: sentAttachments,
     })
-    this.renderer.renderMessages(
-      this.messagesEl,
-      this.messages,
-      this.toolState,
-    )
+    this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
     this.updateClearButton()
     await this.persistHistory()
 
     // Send to Pi
     try {
-      const options: { images?: ImageContent[] } =
-        images.length > 0 ? { images } : {}
+      const options: { images?: ImageContent[] } = images.length > 0 ? { images } : {}
       await session.prompt(fullMessage, options)
     } catch (err) {
       this.messages.push({
         role: 'system',
         text: 'Error: ' + (err instanceof Error ? err.message : String(err)),
       })
-      this.renderer.renderMessages(
-        this.messagesEl,
-        this.messages,
-        this.toolState,
-      )
+      this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
       this.updateClearButton()
       await this.persistHistory()
       this.isStreaming = false
@@ -504,9 +481,7 @@ export class PiChatView extends ItemView {
   }
 
   private mentionItems(query: string): SuggestItem[] {
-    const files = this.app.vault
-      .getFiles()
-      .map((f) => ({ path: f.path, mtime: f.stat.mtime }))
+    const files = this.app.vault.getFiles().map((f) => ({ path: f.path, mtime: f.stat.mtime }))
     const matcher = query ? prepareFuzzySearch(query) : null
     const score = (_q: string, path: string): number | null => {
       if (!matcher) return 0
@@ -538,15 +513,12 @@ export class PiChatView extends ItemView {
       const attachment = await createAttachmentFromFile(this.app.vault, file)
       this.pendingAttachments.push(attachment)
       this.updateSendButton()
-    } catch (e) {
+    } catch {
       // Error notice is shown by createAttachmentFromFile
     }
   }
 
-  private insertMentionText(
-    mention: { query: string; start: number },
-    token: string,
-  ): void {
+  private insertMentionText(mention: { query: string; start: number }, token: string): void {
     const { value, caret } = replaceMention(
       this.inputEl.value,
       mention.start,
@@ -556,16 +528,12 @@ export class PiChatView extends ItemView {
     this.inputEl.value = value
     this.inputEl.setSelectionRange(caret, caret)
     this.inputEl.style.height = 'auto'
-    this.inputEl.style.height =
-      Math.min(this.inputEl.scrollHeight, 200) + 'px'
+    this.inputEl.style.height = Math.min(this.inputEl.scrollHeight, 200) + 'px'
     this.updateSendButton()
   }
 
   private reconcileInlineMentions(): void {
-    const survivors = reconcileMentions(
-      this.inputEl.value,
-      this.pendingAttachments,
-    )
+    const survivors = reconcileMentions(this.inputEl.value, this.pendingAttachments)
     if (survivors.length !== this.pendingAttachments.length) {
       this.pendingAttachments = survivors
       this.updateSendButton()
@@ -605,11 +573,7 @@ export class PiChatView extends ItemView {
       this.currentToolCalls.clear()
       this.isStreaming = false
       this.updateSendButton()
-      this.renderer.renderMessages(
-        this.messagesEl,
-        this.messages,
-        this.toolState,
-      )
+      this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
     }
   }
 
