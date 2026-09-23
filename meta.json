@@ -79451,7 +79451,7 @@
       "format": "esm"
     },
     "src/pi-chat-view.ts": {
-      "bytes": 21010,
+      "bytes": 22417,
       "imports": [
         {
           "path": "obsidian",
@@ -79512,7 +79512,7 @@
       "format": "esm"
     },
     "src/settings-tab.ts": {
-      "bytes": 3438,
+      "bytes": 3446,
       "imports": [
         {
           "path": "obsidian",
@@ -79533,7 +79533,7 @@
       "format": "esm"
     },
     "src/cwd-switcher-modal.ts": {
-      "bytes": 980,
+      "bytes": 1260,
       "imports": [
         {
           "path": "obsidian",
@@ -79549,7 +79549,7 @@
       "format": "esm"
     },
     "src/main.ts": {
-      "bytes": 3049,
+      "bytes": 3082,
       "imports": [
         {
           "path": "src/sdk-runtime-init.ts",
@@ -79585,7 +79585,7 @@
       "imports": [],
       "exports": [],
       "inputs": {},
-      "bytes": 7952413
+      "bytes": 7953540
     },
     "main.js": {
       "imports": [
@@ -87084,7 +87084,7 @@
           "bytesInOutput": 181
         },
         "node_modules/parse5/lib/common/doctype.js": {
-          "bytesInOutput": 3438
+          "bytesInOutput": 3442
         },
         "node_modules/parse5/lib/common/foreign-content.js": {
           "bytesInOutput": 5253
@@ -87456,7 +87456,7 @@
           "bytesInOutput": 3144
         },
         "src/main.ts": {
-          "bytesInOutput": 1513
+          "bytesInOutput": 1522
         },
         "src/sdk-runtime.ts": {
           "bytesInOutput": 1159
@@ -87465,7 +87465,7 @@
           "bytesInOutput": 11
         },
         "src/pi-chat-view.ts": {
-          "bytesInOutput": 12282
+          "bytesInOutput": 13368
         },
         "src/path-utils.ts": {
           "bytesInOutput": 207
@@ -90147,13 +90147,13 @@
           "bytesInOutput": 1150
         },
         "src/settings-tab.ts": {
-          "bytesInOutput": 2068
+          "bytesInOutput": 2076
         },
         "src/cwd-switcher-modal.ts": {
-          "bytesInOutput": 504
+          "bytesInOutput": 672
         }
       },
-      "bytes": 7062596
+      "bytes": 7063871
     }
   }
 }

@@ -33,9 +33,9 @@ export class PiPluginSettingTab extends PluginSettingTab {
       })
 
     new Setting(containerEl)
-      .setName('Working directory')
+      .setName('Focus target')
       .setDesc(
-        'Absolute path used as the Pi agent working directory. Leave blank to use the vault root.',
+        'Directory Pi focuses on when focus mode is enabled. Leave blank to keep the vault root as the target.',
       )
       .addText((text) => {
         text

@@ -16,9 +16,14 @@
   flex-shrink: 0;
   min-width: 0;
   max-width: 140px;
+  max-height: 24px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 4px center;
+}
+
+.pi-chat-domain.is-hidden {
+  visibility: hidden;
 }
 
 .pi-chat-domain.low {
@@ -41,6 +46,45 @@
   outline: none;
   box-shadow: none;
   border-color: var(--background-modifier-border-hover);
+}
+
+.pi-chat-focus {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: auto;
+  min-height: 22px;
+}
+
+.pi-chat-focus-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: none;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.pi-chat-focus-toggle.is-active {
+  color: var(--interactive-accent);
+  background: var(--background-modifier-accent) !important;
+}
+
+.pi-chat-focus-toggle:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover) !important;
+}
+
+.pi-chat-focus-toggle svg {
+  width: 14px;
+  height: 14px;
 }
 
 /* ─── Obsidian Pi — theme-safe CSS ──────────────────────────── */
@@ -81,7 +125,6 @@
 .pi-chat-context {
   font-size: var(--font-ui-smaller);
   color: var(--text-muted);
-  margin-right: auto;
   padding: 1px 6px;
   border-radius: 4px;
   background: var(--background-secondary);

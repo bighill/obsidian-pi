@@ -1,4 +1,4 @@
-import { App, FuzzySuggestModal, Notice } from 'obsidian'
+import { App, FuzzySuggestModal, Notice, FileSystemAdapter } from 'obsidian'
 import type ObsidianPiPlugin from './main'
 import { currentCwdLabel, listCwdOptions, type CwdOption } from './cwd-options'
 
@@ -21,10 +21,16 @@ export class CwdSwitcherModal extends FuzzySuggestModal<CwdOption> {
 
   async onChooseItem(item: CwdOption, evt: MouseEvent | KeyboardEvent): Promise<void> {
     void evt
-    if (item.value === this.plugin.settings.workingDir) return
-    this.plugin.settings.workingDir = item.value
+    const vaultRoot =
+      this.app.vault.adapter instanceof FileSystemAdapter
+        ? this.app.vault.adapter.getBasePath()
+        : process.cwd()
+    const target = item.value === vaultRoot ? '' : item.value
+    if (target === this.plugin.settings.workingDir && this.plugin.settings.focus) return
+    this.plugin.settings.workingDir = target
+    this.plugin.settings.focus = true
     await this.plugin.saveSettings()
-    new Notice(`Pi working directory set to ${currentCwdLabel(item.value)}`)
+    new Notice(`Pi focus set to ${currentCwdLabel(item.value)}`)
     await this.plugin.restartChatSessions('cwd-change')
   }
 }

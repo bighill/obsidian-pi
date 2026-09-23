@@ -14,6 +14,7 @@ export interface PiPluginSettings {
   model: string
   thinkingLevel: ThinkingLevel | ''
   workingDir: string
+  focus: boolean
   saveHistory: boolean
   history: ChatMessage[]
 }
@@ -22,6 +23,7 @@ const DEFAULT_SETTINGS: PiPluginSettings = {
   model: '',
   thinkingLevel: '',
   workingDir: '',
+  focus: false,
   saveHistory: false,
   history: [],
 }

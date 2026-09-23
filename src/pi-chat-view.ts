@@ -47,6 +47,7 @@ export class PiChatView extends ItemView {
   private retryBtn!: HTMLElement
   private clearBtn!: HTMLElement
   private contextEl!: HTMLElement
+  private focusToggleBtn!: HTMLElement
   private domainSelect!: HTMLSelectElement
   private contextUpdateInterval: number | null = null
   private messages: ChatMessage[] = []
@@ -93,14 +94,27 @@ export class PiChatView extends ItemView {
     const titleEl = header.createDiv('pi-chat-title')
     titleEl.setText('Pi')
 
-    this.domainSelect = header.createEl('select', { cls: 'pi-chat-domain' })
+    this.contextEl = header.createDiv('pi-chat-context')
+    this.contextEl.setText('')
+
+    const focusWrap = header.createDiv('pi-chat-focus')
+    this.focusToggleBtn = focusWrap.createEl('button', {
+      cls: 'pi-chat-focus-toggle',
+    })
+    setIcon(this.focusToggleBtn, 'target')
+    this.focusToggleBtn.setAttribute('aria-label', 'Focus on subdomain (off)')
+    this.focusToggleBtn.setAttribute('aria-pressed', 'false')
+    this.registerDomEvent(this.focusToggleBtn, 'click', () => {
+      void this.toggleFocus()
+    })
+
+    this.domainSelect = focusWrap.createEl('select', { cls: 'pi-chat-domain' })
     this.registerDomEvent(this.domainSelect, 'change', () => {
       void this.handleCwdChange()
     })
     this.refreshCwdSelect()
+    this.refreshFocusToggle()
 
-    this.contextEl = header.createDiv('pi-chat-context')
-    this.contextEl.setText('')
     this.statusEl = header.createDiv('pi-chat-status')
     this.statusEl.setText('Not connected')
     this.retryBtn = header.createDiv('pi-chat-retry')
@@ -238,6 +252,7 @@ export class PiChatView extends ItemView {
       this.statusEl.removeClass('pi-chat-status-error')
       this.retryBtn.addClass('is-hidden')
       this.refreshCwdSelect()
+      this.refreshFocusToggle()
       this.restoreHistory()
       this.startContextPoller()
     } catch (err) {
@@ -261,13 +276,13 @@ export class PiChatView extends ItemView {
 
   private updateContextDisplay(): void {
     const session = this.sessionService.getSession()
-    if (!session || !this.contextEl || !this.domainSelect) return
+    if (!session || !this.contextEl) return
     const usage = session.getContextUsage()
     if (!usage || usage.percent == null) {
       this.contextEl.setText('')
       this.contextEl.removeAttribute('title')
       this.contextEl.removeClass('low', 'medium', 'high')
-      this.domainSelect.removeClass('low', 'medium', 'high')
+      this.domainSelect?.removeClass('low', 'medium', 'high')
       return
     }
     const pct = Math.round(usage.percent)
@@ -278,16 +293,16 @@ export class PiChatView extends ItemView {
       `${tokens.toLocaleString()} / ${usage.contextWindow.toLocaleString()} tokens`,
     )
     this.contextEl.removeClass('low', 'medium', 'high')
-    this.domainSelect.removeClass('low', 'medium', 'high')
+    this.domainSelect?.removeClass('low', 'medium', 'high')
     if (pct < 50) {
       this.contextEl.addClass('low')
-      this.domainSelect.addClass('low')
+      this.domainSelect?.addClass('low')
     } else if (pct < 80) {
       this.contextEl.addClass('medium')
-      this.domainSelect.addClass('medium')
+      this.domainSelect?.addClass('medium')
     } else {
       this.contextEl.addClass('high')
-      this.domainSelect.addClass('high')
+      this.domainSelect?.addClass('high')
     }
   }
 
@@ -610,41 +625,67 @@ export class PiChatView extends ItemView {
 
   private refreshCwdSelect(): void {
     if (!this.domainSelect) return
-    const currentCwd = this.getEffectiveCwd()
-    const options = listCwdOptions(currentCwd)
+    const targetCwd = this.getTargetCwd()
+    const options = listCwdOptions(targetCwd)
 
     this.domainSelect.empty()
     this.domainSelect.createEl('option', {
-      text: currentCwdLabel(currentCwd),
-      value: currentCwd,
+      text: currentCwdLabel(targetCwd),
+      value: targetCwd,
     })
     for (const option of options) {
       this.domainSelect.createEl('option', { text: option.label, value: option.value })
     }
-    this.domainSelect.value = currentCwd
+    this.domainSelect.value = targetCwd
   }
 
   private async handleCwdChange(): Promise<void> {
-    const newCwd = this.domainSelect.value
-    if (newCwd === this.getEffectiveCwd()) return
-    this.plugin.settings.workingDir = newCwd === this.getDefaultCwd() ? '' : newCwd
+    const newTarget = this.domainSelect.value
+    const currentTarget = this.getTargetCwd()
+    if (newTarget === currentTarget) return
+    this.plugin.settings.workingDir = newTarget === this.getDefaultCwd() ? '' : newTarget
     await this.plugin.saveSettings()
-    await this.restartSession('cwd-change')
+    if (this.plugin.settings.focus) {
+      await this.restartSession('cwd-change')
+    } else {
+      this.refreshCwdSelect()
+    }
   }
 
   private getEffectiveCwd(): string {
-    return (
-      expandHome(this.plugin.settings.workingDir) ||
-      (this.app.vault.adapter instanceof FileSystemAdapter
-        ? this.app.vault.adapter.getBasePath()
-        : process.cwd())
-    )
+    if (!this.plugin.settings.focus) {
+      return this.getDefaultCwd()
+    }
+    return expandHome(this.plugin.settings.workingDir) || this.getDefaultCwd()
   }
 
   private getDefaultCwd(): string {
     return this.app.vault.adapter instanceof FileSystemAdapter
       ? this.app.vault.adapter.getBasePath()
       : process.cwd()
+  }
+
+  private getTargetCwd(): string {
+    return expandHome(this.plugin.settings.workingDir) || this.getDefaultCwd()
+  }
+
+  private refreshFocusToggle(): void {
+    if (!this.focusToggleBtn) return
+    const focused = this.plugin.settings.focus
+    this.focusToggleBtn.toggleClass('is-active', focused)
+    this.focusToggleBtn.setAttribute('aria-pressed', String(focused))
+    this.focusToggleBtn.setAttribute(
+      'aria-label',
+      focused ? 'Focus on subdomain (on)' : 'Focus on subdomain (off)',
+    )
+    this.domainSelect?.toggleClass('is-hidden', !focused)
+  }
+
+  private async toggleFocus(): Promise<void> {
+    this.plugin.settings.focus = !this.plugin.settings.focus
+    await this.plugin.saveSettings()
+    this.refreshFocusToggle()
+    await this.restartSession('cwd-change')
   }
 
   async onClose() {
