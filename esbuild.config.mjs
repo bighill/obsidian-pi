@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import { builtinModules } from "node:module";
+import { writeFileSync } from "node:fs";
 
 const prod = process.argv[2] === "production";
 
@@ -49,4 +50,11 @@ esbuild.build({
   treeShaking: true,
   outfile: "main.js",
   minify: prod,
-}).catch(() => process.exit(1));
+  metafile: prod,
+})
+  .then((result) => {
+    if (prod && result.metafile) {
+      writeFileSync("meta.json", JSON.stringify(result.metafile, null, 2));
+    }
+  })
+  .catch(() => process.exit(1));

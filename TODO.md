@@ -78,16 +78,16 @@
 
 ## High Priority
 
-### [ ] TICKET-006 — Reduce production bundle size
+### [x] TICKET-006 — Reduce production bundle size
 - **Priority:** P1
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** `main.js` is 6.4 MB because the entire Pi CLI/TUI SDK is bundled, including terminal UI, RPC client, Acorn parser, graceful-fs, and image-processing WASM references.
 - **Acceptance:**
-  - [ ] Generate esbuild metafile and identify largest contributors
-  - [ ] Determine whether TUI/RPC/parser code can be tree-shaken
-  - [ ] Open upstream request for a slimmer SDK export if needed
-  - [ ] Target bundle size documented (e.g., < 1 MB compressed)
+  - [x] Generate esbuild metafile and identify largest contributors
+  - [x] Determine whether TUI/RPC/parser code can be tree-shaken
+  - [x] Open upstream request for a slimmer SDK export if needed
+  - [x] Target bundle size documented (e.g., < 1 MB compressed)
 
 ### [x] TICKET-007 — Refactor `pi-chat-view.ts` into smaller modules
 - **Priority:** P1
