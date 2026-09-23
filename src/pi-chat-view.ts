@@ -16,9 +16,11 @@ import {
   rankMentions,
   reconcileMentions,
   replaceMention,
+  stripInlineTokens,
 } from './at-mention'
 import {
   createAttachmentFromFile,
+  type ChatAttachment,
   type ImageContent,
   type PendingAttachment,
 } from './attachments'
@@ -413,7 +415,7 @@ export class PiChatView extends ItemView {
     const hasAttachments = this.pendingAttachments.length > 0
     if ((!text && !hasAttachments) || this.isStreaming || !session) return
 
-    // Build full message with inline file attachments and collect images
+    // Build the prompt text with inline file attachments and collect images
     let fullMessage = text
     const images: ImageContent[] = []
     for (const att of this.pendingAttachments) {
@@ -429,13 +431,26 @@ export class PiChatView extends ItemView {
       fullMessage = `📎 ${this.pendingAttachments.map((a) => a.name).join(', ')}`
     }
 
+    const displayText =
+      stripInlineTokens(text, this.pendingAttachments) ||
+      (hasAttachments
+        ? `📎 ${this.pendingAttachments.map((a) => a.name).join(', ')}`
+        : '')
+
     this.inputEl.value = ''
     this.inputEl.style.height = 'auto'
+    const sentAttachments: ChatAttachment[] = this.pendingAttachments.map(
+      (att) => ({ ...att }),
+    )
     this.pendingAttachments = []
     this.closeMentionSuggest()
 
     // Add user message to UI
-    this.messages.push({ role: 'user', text: fullMessage })
+    this.messages.push({
+      role: 'user',
+      text: displayText,
+      attachments: sentAttachments,
+    })
     this.renderer.renderMessages(
       this.messagesEl,
       this.messages,

@@ -168,15 +168,15 @@
   - [x] Replace raw listeners with `this.registerDomEvent`
   - [x] Ensure listeners are cleaned up on `onClose`
 
-### [ ] TICKET-014 — Harden file attachment handling
+### [x] TICKET-014 — Harden file attachment handling
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** Large binary/image files are base64-encoded synchronously in the renderer, and `splitFileBlocks` relies on a fragile regex.
 - **Acceptance:**
-  - [ ] Cap image/file attachment size with user warning
-  - [ ] Replace regex-based round-trip with structured attachment metadata
-  - [ ] Async file reading does not block UI for large files
+  - [x] Cap image/file attachment size with user warning
+  - [x] Replace regex-based round-trip with structured attachment metadata
+  - [x] Async file reading does not block UI for large files
 
 ### [ ] TICKET-015 — Improve tool-call rendering identity
 - **Priority:** P2

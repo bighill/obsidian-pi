@@ -1,11 +1,13 @@
 import { App, Component, MarkdownRenderer, setIcon } from 'obsidian'
 import { splitFileBlocks } from './at-mention'
+import type { ChatAttachment } from './attachments'
 
 /** A rendered chat message stored in the view. */
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system'
   text: string
   toolCalls?: ToolCallInfo[]
+  attachments?: ChatAttachment[]
 }
 
 /** Tool call metadata produced by the SDK and rendered in the UI. */
@@ -52,7 +54,15 @@ export class MessageRenderer {
       )
 
       if (msg.role === 'user') {
-        this.renderUserText(msgEl, msg.text)
+        if (msg.attachments && msg.attachments.length > 0) {
+          if (msg.text) {
+            const textEl = msgEl.createDiv('pi-chat-message-text')
+            this.renderMarkdown(textEl, msg.text)
+          }
+          this.renderUserAttachments(msgEl, msg.attachments)
+        } else {
+          this.renderUserText(msgEl, msg.text)
+        }
       } else {
         const textEl = msgEl.createDiv('pi-chat-message-text')
         this.renderMarkdown(textEl, msg.text)
@@ -124,6 +134,37 @@ export class MessageRenderer {
           text: seg.body,
         })
       }
+    }
+  }
+
+  private renderUserAttachments(
+    msgEl: HTMLElement,
+    attachments: ChatAttachment[],
+  ): void {
+    for (const att of attachments) {
+      if (att.image) {
+        const labelEl = msgEl.createDiv('pi-chat-attachment-label')
+        labelEl.setText(`📎 ${att.name} (image)`)
+        continue
+      }
+
+      const body = att.body ?? att.content ?? ''
+      if (!body) {
+        const labelEl = msgEl.createDiv('pi-chat-attachment-label')
+        labelEl.setText(`📎 ${att.name}`)
+        continue
+      }
+
+      const details = msgEl.createEl('details', {
+        cls: 'pi-chat-file-attachment',
+      })
+      details.createEl('summary', {
+        cls: 'pi-chat-file-summary',
+        text: att.name + (att.tooLarge ? ' (too large; name only)' : ''),
+      })
+      details.createEl('pre', { cls: 'pi-chat-file-body' }).createEl('code', {
+        text: body,
+      })
     }
   }
 

@@ -512,3 +512,9 @@
   font-size: var(--font-ui-smaller);
   background: transparent;
 }
+
+.pi-chat-attachment-label {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin-top: 4px;
+}

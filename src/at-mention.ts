@@ -127,6 +127,25 @@ export function reconcileMentions<
   )
 }
 
+/** Remove attachment tokens from `text` so attachments don't render twice. */
+export function stripInlineTokens(
+  text: string,
+  attachments: { token?: string }[],
+): string {
+  let out = text
+  for (const att of attachments) {
+    if (!att.token) continue
+    out = out.replace(
+      new RegExp(
+        att.token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*',
+        'g',
+      ),
+      ' ',
+    )
+  }
+  return out.replace(/\s+/g, ' ').trim()
+}
+
 /**
  * Rank vault files for the mention dropdown.
  *

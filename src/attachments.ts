@@ -5,6 +5,9 @@ import {
   imageMimeFromExt,
 } from './at-mention'
 
+/** Maximum bytes read for a single attachment (2 MB). Larger files are attached by name only. */
+export const MAX_ATTACHMENT_BYTES = 2 * 1024 * 1024
+
 /** Image payload suitable for vision-capable models. */
 export interface ImageContent {
   type: 'image'
@@ -12,13 +15,19 @@ export interface ImageContent {
   mimeType: string
 }
 
-/** A file attachment waiting to be sent with the next user message. */
-export interface PendingAttachment {
+/** Metadata stored with a chat message so attachments render without regex parsing. */
+export interface ChatAttachment {
   name: string
-  content?: string
   token?: string
-  inline?: boolean
+  content?: string
+  body?: string
   image?: ImageContent
+  tooLarge?: boolean
+}
+
+/** A file attachment waiting to be sent with the next user message. */
+export interface PendingAttachment extends ChatAttachment {
+  inline?: boolean
 }
 
 /**
@@ -36,6 +45,13 @@ export async function createAttachmentFromFile(
     token: `@${file.path}`,
   }
 
+  if (file.stat.size > MAX_ATTACHMENT_BYTES) {
+    new Notice(
+      `Attachment ${file.name} exceeds ${(MAX_ATTACHMENT_BYTES / 1024 / 1024).toFixed(0)} MB limit; attached by name only.`,
+    )
+    return { ...base, content: `[Attached file: ${file.name}]`, tooLarge: true }
+  }
+
   try {
     const kind = classifyFile(file.name)
     if (kind === 'image') {
@@ -45,8 +61,12 @@ export async function createAttachmentFromFile(
     }
 
     if (kind === 'text') {
-      const content = await vault.read(file)
-      return { ...base, content: formatTextAttachment(file.path, content) }
+      const body = await vault.read(file)
+      return {
+        ...base,
+        body,
+        content: formatTextAttachment(file.path, body),
+      }
     }
 
     return { ...base, content: `[Attached file: ${file.name}]` }
