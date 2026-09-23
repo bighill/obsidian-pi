@@ -13,6 +13,8 @@ import type ObsidianPiPlugin from './main'
 import {
   createAgentSession,
   DefaultResourceLoader,
+  AuthStorage,
+  ModelRegistry,
   type AgentSession,
   type AgentSessionEvent,
   type CreateAgentSessionOptions,
@@ -222,6 +224,30 @@ export class PiChatView extends ItemView {
       // Apply settings overrides if set
       if (this.plugin.settings.thinkingLevel) {
         options.thinkingLevel = this.plugin.settings.thinkingLevel
+      }
+
+      if (this.plugin.settings.model) {
+        const modelSetting = this.plugin.settings.model
+        const colonIndex = modelSetting.indexOf(':')
+        if (colonIndex > 0 && colonIndex < modelSetting.length - 1) {
+          const provider = modelSetting.slice(0, colonIndex)
+          const modelId = modelSetting.slice(colonIndex + 1)
+          const authStorage = AuthStorage.create(join(agentDir, 'auth.json'))
+          const modelRegistry = ModelRegistry.create(
+            authStorage,
+            join(agentDir, 'models.json'),
+          )
+          const model = modelRegistry.find(provider, modelId)
+          if (model) {
+            options.model = model
+          } else {
+            throw new Error(`Model not found: ${modelSetting}`)
+          }
+        } else {
+          throw new Error(
+            `Model must be in "provider:modelId" format: ${modelSetting}`,
+          )
+        }
       }
 
       const result = await createAgentSession(options)
@@ -686,6 +712,18 @@ export class PiChatView extends ItemView {
       setIcon(this.sendBtn, 'send-horizontal')
       this.sendBtn.disabled = false
     }
+  }
+
+  async restartSession(): Promise<void> {
+    this.stopContextPoller()
+    this.unsubscribe?.()
+    this.unsubscribe = null
+    this.session = null
+    this.currentAssistantText = ''
+    this.currentToolCalls.clear()
+    this.isStreaming = false
+    this.updateSendButton()
+    await this.initSession()
   }
 
   async onClose() {

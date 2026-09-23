@@ -1,5 +1,6 @@
 import { Plugin, WorkspaceLeaf } from 'obsidian'
 import { PiChatView, VIEW_TYPE_PI_CHAT } from './pi-chat-view'
+import { PiPluginSettingTab } from './settings-tab'
 import type { CreateAgentSessionOptions } from '@mariozechner/pi-coding-agent'
 
 type ThinkingLevel = NonNullable<CreateAgentSessionOptions['thinkingLevel']>
@@ -27,6 +28,8 @@ export default class ObsidianPiPlugin extends Plugin {
       (leaf: WorkspaceLeaf) => new PiChatView(leaf, this),
     )
 
+    this.addSettingTab(new PiPluginSettingTab(this.app, this))
+
     this.addRibbonIcon('bot', 'Pi Chat', () => {
       this.activateView()
     })
@@ -46,6 +49,15 @@ export default class ObsidianPiPlugin extends Plugin {
       await leaf.setViewState({ type: VIEW_TYPE_PI_CHAT, active: true })
     }
     workspace.revealLeaf(leaf)
+  }
+
+  async restartChatSessions(): Promise<void> {
+    for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE_PI_CHAT)) {
+      const view = leaf.view
+      if (view instanceof PiChatView) {
+        await view.restartSession()
+      }
+    }
   }
 
   async loadSettings() {

@@ -41,18 +41,18 @@
   - [x] `@mariozechner/pi-coding-agent` upgraded to latest compatible version and tested
 - **Notes:** After upgrading to `0.73.1` (latest `@mariozechner/pi-coding-agent`), 2 residual high-severity findings remain. Both are upstream SDK/TUI issues not exercised by this plugin and are documented in `docs/security-notes.md`.
 
-### [ ] TICKET-003 — Add plugin settings UI
+### [x] TICKET-003 — Add plugin settings UI
 - **Priority:** P0
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** `PiPluginSettings` declares `model`, `thinkingLevel`, and `workingDir`, but no settings tab exists and values are never saved.
 - **Acceptance:**
-  - [ ] `PluginSettingTab` implementation created and registered
-  - [ ] Text input for `workingDir` with folder validation
-  - [ ] Dropdown or text input for `model`
-  - [ ] Dropdown for `thinkingLevel` (`off`, `low`, `medium`, `high`, etc.)
-  - [ ] Settings persist to Obsidian plugin data via `saveData` / `loadData`
-  - [ ] Changes reflect immediately in an active chat session
+  - [x] `PluginSettingTab` implementation created and registered
+  - [x] Text input for `workingDir` with folder validation
+  - [x] Dropdown or text input for `model`
+  - [x] Dropdown for `thinkingLevel` (`off`, `low`, `medium`, `high`, etc.)
+  - [x] Settings persist to Obsidian plugin data via `saveData` / `loadData`
+  - [x] Changes reflect immediately in an active chat session
 
 ### [x] TICKET-004 — Write README.md
 - **Priority:** P0
