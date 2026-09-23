@@ -65,13 +65,13 @@
   - [ ] How to use `@`-mentions and image attachments
   - [ ] Minimum Obsidian version and platform support
 
-### [ ] TICKET-005 — Add LICENSE file
+### [x] TICKET-005 — Add LICENSE file
 - **Priority:** P0
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** `package.json` says MIT but no license file is present.
 - **Acceptance:**
-  - [ ] `LICENSE` file added at repo root with MIT license and current year/author
+  - [x] `LICENSE` file added at repo root with MIT license and current year/author
 
 ---
 
