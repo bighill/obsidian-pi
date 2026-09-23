@@ -258,15 +258,15 @@
   - [x] `npm run lint` and `npm run format` scripts added
   - [x] CI runs lint
 
-### [ ] TICKET-021 — Add `.npmignore` or refine files list
+### [x] TICKET-021 — Add `.npmignore` or refine files list
 
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** `npm pack` currently includes `src/`, `esbuild.config.mjs`, and other build-time files alongside `main.js`.
 - **Acceptance:**
-  - [ ] Decide what belongs in published tarball
-  - [ ] Add `.npmignore` or update `package.json` `files`
+  - [x] Decide what belongs in published tarball
+  - [x] Add `.npmignore` or update `package.json` `files`
 
 ### [ ] TICKET-022 — Document `import.meta.url` polyfill rationale
 

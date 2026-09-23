@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "Pi CLI agent chat in an Obsidian tab",
   "main": "main.js",
+  "files": [
+    "main.js",
+    "styles.css",
+    "manifest.json",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
