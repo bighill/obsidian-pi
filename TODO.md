@@ -210,14 +210,14 @@
 
 ## Low Priority / Polish
 
-### [ ] TICKET-018 — Upgrade TypeScript to stable release
+### [x] TICKET-018 — Upgrade TypeScript to stable release
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** `typescript@5.9.3` is not a normal stable release line.
 - **Acceptance:**
-  - [ ] Pin to stable `^5.5.0` or latest stable 5.x
-  - [ ] `npm run typecheck` still passes
+  - [x] Pin to stable `^5.5.0` or latest stable 5.x
+  - [x] `npm run typecheck` still passes
 
 ### [x] TICKET-019 — Upgrade esbuild to latest patch
 - **Priority:** P2
