@@ -97,7 +97,7 @@
 - **Acceptance:**
   - [ ] Extract `PiSessionService` to wrap `createAgentSession`, `DefaultResourceLoader`, and event subscription
   - [x] Extract attachment helpers into `src/attachments.ts`
-  - [ ] Extract message/tool rendering into `src/message-renderer.ts`
+  - [x] Extract message/tool rendering into `src/message-renderer.ts`
   - [ ] `PiChatView` remains focused on view lifecycle and user input only
 
 ### [x] TICKET-008 — Improve SDK runtime initialization reliability

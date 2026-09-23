@@ -1,6 +1,5 @@
 import {
   ItemView,
-  MarkdownRenderer,
   WorkspaceLeaf,
   setIcon,
   TFile,
@@ -25,28 +24,20 @@ import {
   rankMentions,
   reconcileMentions,
   replaceMention,
-  splitFileBlocks,
 } from './at-mention'
 import {
   createAttachmentFromFile,
   type ImageContent,
   type PendingAttachment,
 } from './attachments'
+import {
+  MessageRenderer,
+  type ChatMessage,
+  type ToolCallInfo,
+  type ToolState,
+} from './message-renderer'
 
 export const VIEW_TYPE_PI_CHAT = 'pi-chat'
-
-interface ChatMessage {
-  role: 'user' | 'assistant' | 'system'
-  text: string
-  toolCalls?: ToolCallInfo[]
-}
-
-interface ToolCallInfo {
-  name: string
-  args: string
-  result?: string
-  isError?: boolean
-}
 
 export class PiChatView extends ItemView {
   plugin: ObsidianPiPlugin
@@ -63,8 +54,11 @@ export class PiChatView extends ItemView {
   private isStreaming = false
   private currentAssistantText = ''
   private currentToolCalls: Map<string, ToolCallInfo> = new Map()
-  private toolCallExpanded: Map<string, boolean> = new Map()
-  private toggledToolCalls: Set<string> = new Set()
+  private toolState: ToolState = {
+    expanded: new Map(),
+    toggled: new Set(),
+  }
+  private renderer!: MessageRenderer
   private suggest!: InlineSuggest
   private activeMention: { query: string; start: number } | null = null
   private pendingAttachments: PendingAttachment[] = []
@@ -112,6 +106,7 @@ export class PiChatView extends ItemView {
 
     // Messages container
     this.messagesEl = wrapper.createDiv('pi-chat-messages')
+    this.renderer = new MessageRenderer(this.app, this)
 
     // Input area
     const inputArea = wrapper.createDiv('pi-chat-input-area')
@@ -320,7 +315,13 @@ export class PiChatView extends ItemView {
         const assistantEvent = event.assistantMessageEvent
         if (assistantEvent?.type === 'text_delta') {
           this.currentAssistantText += assistantEvent.delta
-          this.updateStreamingMessage()
+          this.renderer.renderStreaming(
+            this.messagesEl,
+            this.currentAssistantText,
+            this.currentToolCalls,
+            this.toolState,
+          )
+          this.scrollToBottom()
         } else if (assistantEvent?.type === 'thinking_delta') {
           // Could render thinking block, for now skip
         }
@@ -333,7 +334,13 @@ export class PiChatView extends ItemView {
           args: JSON.stringify(event.args, null, 2),
         }
         this.currentToolCalls.set(event.toolCallId, toolCall)
-        this.updateStreamingMessage()
+        this.renderer.renderStreaming(
+          this.messagesEl,
+          this.currentAssistantText,
+          this.currentToolCalls,
+          this.toolState,
+        )
+        this.scrollToBottom()
         break
       }
 
@@ -344,7 +351,13 @@ export class PiChatView extends ItemView {
           toolCall.result = typeof result === 'string' ? result : JSON.stringify(result, null, 2)
           toolCall.isError = event.isError
         }
-        this.updateStreamingMessage()
+        this.renderer.renderStreaming(
+          this.messagesEl,
+          this.currentAssistantText,
+          this.currentToolCalls,
+          this.toolState,
+        )
+        this.scrollToBottom()
         break
       }
 
@@ -360,7 +373,11 @@ export class PiChatView extends ItemView {
         this.currentToolCalls.clear()
         this.isStreaming = false
         this.updateSendButton()
-        this.renderMessages()
+        this.renderer.renderMessages(
+          this.messagesEl,
+          this.messages,
+          this.toolState,
+        )
         break
       }
 
@@ -374,123 +391,6 @@ export class PiChatView extends ItemView {
         this.updateSendButton()
         break
     }
-  }
-
-  private updateStreamingMessage() {
-    // Render or update the in-progress assistant bubble
-    let streamEl = this.messagesEl.querySelector('.pi-chat-streaming') as HTMLElement | null
-    if (!streamEl) {
-      streamEl = this.messagesEl.createDiv('pi-chat-message pi-chat-message-assistant pi-chat-streaming')
-    }
-    streamEl.empty()
-
-    // Render text so far
-    if (this.currentAssistantText) {
-      const textEl = streamEl.createDiv('pi-chat-message-text')
-      this.renderMarkdown(textEl, this.currentAssistantText)
-    }
-
-    // Render tool calls
-    for (const [id, tc] of this.currentToolCalls) {
-      this.createToolCallEl(
-        streamEl,
-        tc,
-        id,
-        tc.result === undefined,
-      )
-    }
-
-    this.scrollToBottom()
-  }
-
-  private createToolCallEl(
-    parent: HTMLElement,
-    tc: ToolCallInfo,
-    id: string,
-    defaultExpanded: boolean,
-  ): HTMLElement {
-    const expanded = this.toggledToolCalls.has(id)
-      ? this.toolCallExpanded.get(id)!
-      : defaultExpanded
-
-    const toolEl = parent.createDiv('pi-chat-tool-call')
-    if (tc.isError) toolEl.addClass('pi-chat-tool-error')
-    if (expanded) toolEl.addClass('is-expanded')
-
-    const header = toolEl.createDiv('pi-chat-tool-header')
-    const iconEl = header.createSpan('pi-chat-tool-icon')
-    setIcon(iconEl, 'wrench')
-
-    const nameEl = header.createSpan('pi-chat-tool-name')
-    nameEl.setText(` ${tc.name}`)
-
-    const summary = this.extractToolResultSummary(tc)
-    if (summary) {
-      const summaryEl = header.createSpan('pi-chat-tool-summary')
-      summaryEl.setText(summary)
-    }
-
-    const toggleEl = header.createSpan('pi-chat-tool-toggle')
-    setIcon(toggleEl, expanded ? 'chevron-down' : 'chevron-right')
-
-    if (tc.result === undefined) {
-      toolEl.addClass('pi-chat-tool-running')
-      const spinner = header.createDiv('pi-chat-tool-spinner')
-      spinner.setText('⋯')
-    } else {
-      toolEl.addClass('pi-chat-tool-done')
-    }
-
-    let resultEl: HTMLElement | null = null
-    if (tc.result !== undefined) {
-      resultEl = toolEl.createDiv('pi-chat-tool-result')
-      const pre = resultEl.createEl('pre')
-      pre.setText(tc.result)
-      if (!expanded) resultEl.style.display = 'none'
-    }
-
-    header.addEventListener('click', () => {
-      const isExpanded = toolEl.hasClass('is-expanded')
-      if (isExpanded) {
-        toolEl.removeClass('is-expanded')
-        setIcon(toggleEl, 'chevron-right')
-        if (resultEl) resultEl.style.display = 'none'
-      } else {
-        toolEl.addClass('is-expanded')
-        setIcon(toggleEl, 'chevron-down')
-        if (resultEl) resultEl.style.display = ''
-      }
-      this.toggledToolCalls.add(id)
-      this.toolCallExpanded.set(id, !isExpanded)
-    })
-
-    return toolEl
-  }
-
-  private extractToolResultSummary(tc: ToolCallInfo): string | null {
-    if (!tc.result) return null
-    try {
-      const parsed = JSON.parse(tc.result)
-      if (parsed?.content?.text && typeof parsed.content.text === 'string') {
-        return this.truncateSummary(parsed.content.text)
-      }
-      if (Array.isArray(parsed?.content)) {
-        for (const block of parsed.content) {
-          if (block?.type === 'text' && typeof block.text === 'string') {
-            return this.truncateSummary(block.text)
-          }
-        }
-      }
-    } catch {
-      // Not JSON — ignore
-    }
-    return null
-  }
-
-  private truncateSummary(text: string, maxLen = 80): string {
-    const trimmed = text.trim().replace(/\s+/g, ' ')
-    if (trimmed.length <= maxLen) return trimmed
-    return trimmed.slice(0, maxLen - 1) + '…'
   }
 
   private async handleSend() {
@@ -521,7 +421,11 @@ export class PiChatView extends ItemView {
 
     // Add user message to UI
     this.messages.push({ role: 'user', text: fullMessage })
-    this.renderMessages()
+    this.renderer.renderMessages(
+      this.messagesEl,
+      this.messages,
+      this.toolState,
+    )
 
     // Send to Pi
     try {
@@ -533,68 +437,14 @@ export class PiChatView extends ItemView {
         role: 'system',
         text: 'Error: ' + (err instanceof Error ? err.message : String(err)),
       })
-      this.renderMessages()
+      this.renderer.renderMessages(
+        this.messagesEl,
+        this.messages,
+        this.toolState,
+      )
       this.isStreaming = false
       this.updateSendButton()
     }
-  }
-
-  private renderMessages() {
-    this.messagesEl.empty()
-
-    for (let i = 0; i < this.messages.length; i++) {
-      const msg = this.messages[i]
-      const msgEl = this.messagesEl.createDiv(
-        `pi-chat-message pi-chat-message-${msg.role}`,
-      )
-
-      if (msg.role === 'user') {
-        this.renderUserText(msgEl, msg.text)
-      } else {
-        const textEl = msgEl.createDiv('pi-chat-message-text')
-        this.renderMarkdown(textEl, msg.text)
-      }
-
-      // Render completed tool calls (collapsed by default)
-      if (msg.toolCalls) {
-        for (let j = 0; j < msg.toolCalls.length; j++) {
-          const tc = msg.toolCalls[j]
-          this.createToolCallEl(
-            msgEl,
-            tc,
-            `history-${i}-${j}`,
-            false,
-          )
-        }
-      }
-    }
-
-    this.scrollToBottom()
-  }
-
-  private renderUserText(msgEl: HTMLElement, text: string) {
-    for (const seg of splitFileBlocks(text)) {
-      if (seg.type === 'text') {
-        const textEl = msgEl.createDiv('pi-chat-message-text')
-        this.renderMarkdown(textEl, seg.text)
-      } else {
-        const details = msgEl.createEl('details', {
-          cls: 'pi-chat-file-attachment',
-        })
-        details.createEl('summary', {
-          cls: 'pi-chat-file-summary',
-          text: seg.label,
-        })
-        details.createEl('pre', { cls: 'pi-chat-file-body' }).createEl('code', {
-          text: seg.body,
-        })
-      }
-    }
-  }
-
-  private renderMarkdown(el: HTMLElement, text: string) {
-    const sourcePath = this.app.workspace.getActiveFile()?.path ?? ''
-    MarkdownRenderer.render(this.app, text, el, sourcePath, this)
   }
 
   // ─── @-mention file picker ───────────────────────────────────────────
