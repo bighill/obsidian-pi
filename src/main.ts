@@ -5,6 +5,7 @@ import { Plugin, WorkspaceLeaf } from 'obsidian'
 import { PiChatView, VIEW_TYPE_PI_CHAT } from './pi-chat-view'
 import { PiPluginSettingTab } from './settings-tab'
 import type { CreateAgentSessionOptions } from '@mariozechner/pi-coding-agent'
+import type { ChatMessage } from './message-renderer'
 
 type ThinkingLevel = NonNullable<CreateAgentSessionOptions['thinkingLevel']>
 
@@ -12,12 +13,16 @@ export interface PiPluginSettings {
   model: string
   thinkingLevel: ThinkingLevel | ''
   workingDir: string
+  saveHistory: boolean
+  history: ChatMessage[]
 }
 
 const DEFAULT_SETTINGS: PiPluginSettings = {
   model: '',
   thinkingLevel: '',
   workingDir: '',
+  saveHistory: false,
+  history: [],
 }
 
 export default class ObsidianPiPlugin extends Plugin {
@@ -69,5 +74,31 @@ export default class ObsidianPiPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings)
+  }
+
+  async saveHistory(history: ChatMessage[]): Promise<void> {
+    if (!this.settings.saveHistory) return
+    this.settings.history = history
+    await this.saveData(this.settings)
+  }
+
+  async clearHistory(): Promise<void> {
+    this.settings.history = []
+    await this.saveData(this.settings)
+    for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE_PI_CHAT)) {
+      const view = leaf.view
+      if (view instanceof PiChatView) {
+        view.clearMessages()
+      }
+    }
+  }
+
+  async saveCurrentHistory(): Promise<void> {
+    for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE_PI_CHAT)) {
+      const view = leaf.view
+      if (view instanceof PiChatView) {
+        await view.persistHistory()
+      }
+    }
   }
 }

@@ -138,16 +138,16 @@
 
 ## Medium Priority
 
-### [ ] TICKET-011 — Persist chat history
+### [x] TICKET-011 — Persist chat history
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** Conversation history is lost when the view is closed.
 - **Acceptance:**
-  - [ ] Opt-in setting to save chat history
-  - [ ] History stored in plugin data or a JSON file in the vault
-  - [ ] History restored when the chat view is reopened
-  - [ ] User can clear history from the UI
+  - [x] Opt-in setting to save chat history
+  - [x] History stored in plugin data or a JSON file in the vault
+  - [x] History restored when the chat view is reopened
+  - [x] User can clear history from the UI
 
 ### [ ] TICKET-012 — Add cancel/stop button during agent turns
 - **Priority:** P2

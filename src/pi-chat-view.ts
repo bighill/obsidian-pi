@@ -40,6 +40,7 @@ export class PiChatView extends ItemView {
   private sendBtn!: HTMLButtonElement
   private statusEl!: HTMLElement
   private retryBtn!: HTMLElement
+  private clearBtn!: HTMLElement
   private contextEl!: HTMLElement
   private contextUpdateInterval: number | null = null
   private messages: ChatMessage[] = []
@@ -95,6 +96,14 @@ export class PiChatView extends ItemView {
     this.retryBtn.addClass('is-hidden')
     this.registerDomEvent(this.retryBtn, 'click', () => {
       void this.restartSession()
+    })
+
+    this.clearBtn = header.createDiv('pi-chat-clear')
+    setIcon(this.clearBtn, 'trash-2')
+    this.clearBtn.setAttribute('aria-label', 'Clear chat history')
+    this.clearBtn.addClass('is-hidden')
+    this.registerDomEvent(this.clearBtn, 'click', () => {
+      void this.clearViewHistory()
     })
 
     // Messages container
@@ -205,6 +214,7 @@ export class PiChatView extends ItemView {
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-ready')
       this.retryBtn.addClass('is-hidden')
+      this.restoreHistory()
       this.startContextPoller()
     } catch (err) {
       console.error('obsidian-pi: initSession error:', err)
@@ -251,6 +261,45 @@ export class PiChatView extends ItemView {
     if (this.contextUpdateInterval) {
       window.clearInterval(this.contextUpdateInterval)
       this.contextUpdateInterval = null
+    }
+  }
+
+  private restoreHistory(): void {
+    if (!this.plugin.settings.saveHistory) return
+    const saved = this.plugin.settings.history
+    if (saved && saved.length > 0) {
+      this.messages = JSON.parse(JSON.stringify(saved))
+      this.renderer.renderMessages(
+        this.messagesEl,
+        this.messages,
+        this.toolState,
+      )
+      this.updateClearButton()
+    }
+  }
+
+  clearMessages(): void {
+    this.messages = []
+    this.currentAssistantText = ''
+    this.currentToolCalls.clear()
+    this.renderer.renderMessages(this.messagesEl, [], this.toolState)
+    this.updateClearButton()
+  }
+
+  private async clearViewHistory(): Promise<void> {
+    this.clearMessages()
+    await this.plugin.clearHistory()
+  }
+
+  async persistHistory(): Promise<void> {
+    await this.plugin.saveHistory(this.messages)
+  }
+
+  private updateClearButton(): void {
+    if (this.messages.length > 0) {
+      this.clearBtn.removeClass('is-hidden')
+    } else {
+      this.clearBtn.addClass('is-hidden')
     }
   }
 
@@ -329,6 +378,10 @@ export class PiChatView extends ItemView {
           this.messages,
           this.toolState,
         )
+        this.updateClearButton()
+        this.persistHistory().catch((err) => {
+          console.error('obsidian-pi: failed to persist history:', err)
+        })
         break
       }
 
@@ -378,6 +431,8 @@ export class PiChatView extends ItemView {
       this.messages,
       this.toolState,
     )
+    this.updateClearButton()
+    await this.persistHistory()
 
     // Send to Pi
     try {
@@ -394,6 +449,8 @@ export class PiChatView extends ItemView {
         this.messages,
         this.toolState,
       )
+      this.updateClearButton()
+      await this.persistHistory()
       this.isStreaming = false
       this.updateSendButton()
     }

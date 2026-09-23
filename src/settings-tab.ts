@@ -15,6 +15,25 @@ export class PiPluginSettingTab extends PluginSettingTab {
     containerEl.empty()
 
     new Setting(containerEl)
+      .setName('Save chat history')
+      .setDesc(
+        'Persist conversation history across Obsidian restarts. History is stored in the plugin data file.',
+      )
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.saveHistory)
+          .onChange(async (value) => {
+            this.plugin.settings.saveHistory = value
+            await this.plugin.saveSettings()
+            if (value) {
+              await this.plugin.saveCurrentHistory()
+            } else {
+              await this.plugin.clearHistory()
+            }
+          })
+      })
+
+    new Setting(containerEl)
       .setName('Working directory')
       .setDesc(
         'Absolute path used as the Pi agent working directory. Leave blank to use the vault root.',
