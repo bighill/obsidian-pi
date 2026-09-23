@@ -5,12 +5,13 @@ import { writeFileSync } from 'node:fs'
 
 const prod = process.argv[2] === 'production'
 
-// Polyfill import.meta.url for CJS format — the Pi SDK uses fileURLToPath(import.meta.url)
-// at module load time to find package.json. In CJS, esbuild replaces `import.meta` with
-// an empty object {}, so import.meta.url is undefined, causing fileURLToPath to throw.
-// Use a banner to set up a synthetic URL and define to replace import.meta.url with it.
-// The real package directory is configured at runtime by src/sdk-runtime.ts, which is
-// imported before any Pi SDK modules are evaluated.
+// Polyfill import.meta.url for CJS format — see docs/build-notes.md for the
+// full rationale. In short: the Pi SDK uses fileURLToPath(import.meta.url) at
+// module load time, but esbuild replaces `import.meta` with `{}` in CJS output,
+// so `import.meta.url` is undefined. We use a banner to set a synthetic URL and
+// a define to rewrite every `import.meta.url` to it. The real package directory
+// is configured at runtime by src/sdk-runtime.ts, imported before any Pi SDK
+// modules are evaluated.
 const banner = `var __pi_meta_url = 'file:///dummy-pi-plugin/main.js';`
 
 esbuild

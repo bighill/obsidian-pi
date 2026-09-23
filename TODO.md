@@ -268,16 +268,16 @@
   - [x] Decide what belongs in published tarball
   - [x] Add `.npmignore` or update `package.json` `files`
 
-### [ ] TICKET-022 — Document `import.meta.url` polyfill rationale
+### [x] TICKET-022 — Document `import.meta.url` polyfill rationale
 
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** The esbuild banner contains complex comments and runtime code that future maintainers may not understand.
 - **Acceptance:**
-  - [ ] Add a dedicated `docs/build-notes.md` or expand comments in `esbuild.config.mjs`
-  - [ ] Explain why `import.meta.url` must be polyfilled in Obsidian’s CJS renderer
-  - [ ] Document known platform constraints
+  - [x] Add a dedicated `docs/build-notes.md` or expand comments in `esbuild.config.mjs`
+  - [x] Explain why `import.meta.url` must be polyfilled in Obsidian’s CJS renderer
+  - [x] Document known platform constraints
 
 ---
 
