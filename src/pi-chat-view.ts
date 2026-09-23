@@ -38,6 +38,7 @@ export class PiChatView extends ItemView {
   private messagesEl!: HTMLElement
   private inputEl!: HTMLTextAreaElement
   private sendBtn!: HTMLButtonElement
+  private cancelBtn!: HTMLButtonElement
   private statusEl!: HTMLElement
   private retryBtn!: HTMLElement
   private clearBtn!: HTMLElement
@@ -129,8 +130,17 @@ export class PiChatView extends ItemView {
     })
     setIcon(this.sendBtn, 'send-horizontal')
 
+    this.cancelBtn = inputArea.createEl('button', {
+      cls: 'pi-chat-cancel is-hidden',
+    })
+    setIcon(this.cancelBtn, 'square')
+    this.cancelBtn.setAttribute('aria-label', 'Stop generating')
+
     // ─── Event handlers ─────────────────────────────────────
     this.registerDomEvent(this.sendBtn, 'click', () => this.handleSend())
+    this.registerDomEvent(this.cancelBtn, 'click', () => {
+      void this.cancelTurn()
+    })
     this.registerDomEvent(this.inputEl, 'keydown', (e: KeyboardEvent) => {
       // @-mention dropdown captures navigation keys while open
       if (this.suggest.isOpen) {
@@ -548,9 +558,36 @@ export class PiChatView extends ItemView {
     if (this.isStreaming) {
       setIcon(this.sendBtn, 'loader')
       this.sendBtn.disabled = true
+      this.cancelBtn.removeClass('is-hidden')
     } else {
       setIcon(this.sendBtn, 'send-horizontal')
       this.sendBtn.disabled = false
+      this.cancelBtn.addClass('is-hidden')
+    }
+  }
+
+  private async cancelTurn(): Promise<void> {
+    const session = this.sessionService.getSession()
+    if (!session || !this.isStreaming) return
+
+    try {
+      this.cancelBtn.disabled = true
+      await session.abort()
+    } catch (err) {
+      console.error(
+        'obsidian-pi: cancelTurn error:',
+        err instanceof Error ? err.message : String(err),
+      )
+    } finally {
+      this.currentAssistantText = ''
+      this.currentToolCalls.clear()
+      this.isStreaming = false
+      this.updateSendButton()
+      this.renderer.renderMessages(
+        this.messagesEl,
+        this.messages,
+        this.toolState,
+      )
     }
   }
 

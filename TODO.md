@@ -149,15 +149,15 @@
   - [x] History restored when the chat view is reopened
   - [x] User can clear history from the UI
 
-### [ ] TICKET-012 — Add cancel/stop button during agent turns
+### [x] TICKET-012 — Add cancel/stop button during agent turns
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** The send button becomes a loader icon while streaming but offers no way to interrupt the agent.
 - **Acceptance:**
-  - [ ] Cancel button visible during `isStreaming`
-  - [ ] Cancel aborts the current SDK prompt if supported
-  - [ ] UI returns to idle state safely
+  - [x] Cancel button visible during `isStreaming`
+  - [x] Cancel aborts the current SDK prompt if supported
+  - [x] UI returns to idle state safely
 
 ### [x] TICKET-013 — Use Obsidian lifecycle APIs for DOM events
 - **Priority:** P2
