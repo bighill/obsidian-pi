@@ -7,6 +7,7 @@ import {
   arrayBufferToBase64,
   prepareFuzzySearch,
   Notice,
+  FileSystemAdapter,
 } from 'obsidian'
 import type ObsidianPiPlugin from './main'
 import {
@@ -14,8 +15,8 @@ import {
   DefaultResourceLoader,
   type AgentSession,
   type AgentSessionEvent,
+  type CreateAgentSessionOptions,
 } from '@mariozechner/pi-coding-agent'
-import type { ImageContent } from '@mariozechner/pi-ai'
 import { join } from 'path'
 import { homedir } from 'os'
 import { InlineSuggest, type SuggestItem } from './inline-suggest'
@@ -43,6 +44,12 @@ interface ToolCallInfo {
   args: string
   result?: string
   isError?: boolean
+}
+
+interface ImageContent {
+  type: 'image'
+  data: string
+  mimeType: string
 }
 
 export class PiChatView extends ItemView {
@@ -189,7 +196,12 @@ export class PiChatView extends ItemView {
       this.statusEl.setText('Starting session…')
       this.statusEl.addClass('pi-chat-status-busy')
 
-      const cwd = this.plugin.settings.workingDir || this.app.vault.adapter.getBasePath()
+      const adapter = this.app.vault.adapter
+      const cwd =
+        this.plugin.settings.workingDir ||
+        (adapter instanceof FileSystemAdapter
+          ? adapter.getBasePath()
+          : process.cwd())
       const agentDir = join(homedir(), '.pi', 'agent')
 
       const resourceLoader = new DefaultResourceLoader({
@@ -201,7 +213,7 @@ export class PiChatView extends ItemView {
       })
       await resourceLoader.reload()
 
-      const options: Record<string, unknown> = {
+      const options: CreateAgentSessionOptions = {
         cwd,
         agentDir,
         resourceLoader,
@@ -212,7 +224,7 @@ export class PiChatView extends ItemView {
         options.thinkingLevel = this.plugin.settings.thinkingLevel
       }
 
-      const result = await createAgentSession(options as any)
+      const result = await createAgentSession(options)
       this.session = result.session
 
       // Subscribe to events
@@ -279,7 +291,7 @@ export class PiChatView extends ItemView {
         break
 
       case 'message_update': {
-        const assistantEvent = (event as any).assistantMessageEvent
+        const assistantEvent = event.assistantMessageEvent
         if (assistantEvent?.type === 'text_delta') {
           this.currentAssistantText += assistantEvent.delta
           this.updateStreamingMessage()
@@ -291,20 +303,20 @@ export class PiChatView extends ItemView {
 
       case 'tool_execution_start': {
         const toolCall: ToolCallInfo = {
-          name: (event as any).toolName,
-          args: JSON.stringify((event as any).args, null, 2),
+          name: event.toolName,
+          args: JSON.stringify(event.args, null, 2),
         }
-        this.currentToolCalls.set((event as any).toolCallId, toolCall)
+        this.currentToolCalls.set(event.toolCallId, toolCall)
         this.updateStreamingMessage()
         break
       }
 
       case 'tool_execution_end': {
-        const toolCall = this.currentToolCalls.get((event as any).toolCallId)
+        const toolCall = this.currentToolCalls.get(event.toolCallId)
         if (toolCall) {
-          const result = (event as any).result
+          const result = event.result
           toolCall.result = typeof result === 'string' ? result : JSON.stringify(result, null, 2)
-          toolCall.isError = (event as any).isError
+          toolCall.isError = event.isError
         }
         this.updateStreamingMessage()
         break

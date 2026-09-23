@@ -1,9 +1,12 @@
 import { Plugin, WorkspaceLeaf } from 'obsidian'
 import { PiChatView, VIEW_TYPE_PI_CHAT } from './pi-chat-view'
+import type { CreateAgentSessionOptions } from '@mariozechner/pi-coding-agent'
+
+type ThinkingLevel = NonNullable<CreateAgentSessionOptions['thinkingLevel']>
 
 export interface PiPluginSettings {
   model: string
-  thinkingLevel: string
+  thinkingLevel: ThinkingLevel | ''
   workingDir: string
 }
 
