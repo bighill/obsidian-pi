@@ -261,11 +261,13 @@ export class PiChatView extends ItemView {
 
   private updateContextDisplay(): void {
     const session = this.sessionService.getSession()
-    if (!session || !this.contextEl) return
+    if (!session || !this.contextEl || !this.domainSelect) return
     const usage = session.getContextUsage()
     if (!usage || usage.percent == null) {
       this.contextEl.setText('')
       this.contextEl.removeAttribute('title')
+      this.contextEl.removeClass('low', 'medium', 'high')
+      this.domainSelect.removeClass('low', 'medium', 'high')
       return
     }
     const pct = Math.round(usage.percent)
@@ -276,9 +278,17 @@ export class PiChatView extends ItemView {
       `${tokens.toLocaleString()} / ${usage.contextWindow.toLocaleString()} tokens`,
     )
     this.contextEl.removeClass('low', 'medium', 'high')
-    if (pct < 50) this.contextEl.addClass('low')
-    else if (pct < 80) this.contextEl.addClass('medium')
-    else this.contextEl.addClass('high')
+    this.domainSelect.removeClass('low', 'medium', 'high')
+    if (pct < 50) {
+      this.contextEl.addClass('low')
+      this.domainSelect.addClass('low')
+    } else if (pct < 80) {
+      this.contextEl.addClass('medium')
+      this.domainSelect.addClass('medium')
+    } else {
+      this.contextEl.addClass('high')
+      this.domainSelect.addClass('high')
+    }
   }
 
   private stopContextPoller(): void {

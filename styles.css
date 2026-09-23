@@ -21,6 +21,18 @@
   background-position: right 4px center;
 }
 
+.pi-chat-domain.low {
+  color: var(--text-muted);
+}
+
+.pi-chat-domain.medium {
+  color: var(--text-accent);
+}
+
+.pi-chat-domain.high {
+  color: var(--text-error);
+}
+
 .pi-chat-domain:hover {
   background-color: var(--background-modifier-hover);
 }
