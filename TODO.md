@@ -53,17 +53,17 @@
   - [ ] Settings persist to Obsidian plugin data via `saveData` / `loadData`
   - [ ] Changes reflect immediately in an active chat session
 
-### [ ] TICKET-004 — Write README.md
+### [x] TICKET-004 — Write README.md
 - **Priority:** P0
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** There is no documentation for users or contributors.
 - **Acceptance:**
-  - [ ] Installation instructions (manual + BRAT)
-  - [ ] Required Pi CLI configuration / credentials
-  - [ ] Explanation of file-system tool risks (read, edit, write, bash)
-  - [ ] How to use `@`-mentions and image attachments
-  - [ ] Minimum Obsidian version and platform support
+  - [x] Installation instructions (manual + BRAT)
+  - [x] Required Pi CLI configuration / credentials
+  - [x] Explanation of file-system tool risks (read, edit, write, bash)
+  - [x] How to use `@`-mentions and image attachments
+  - [x] Minimum Obsidian version and platform support
 
 ### [x] TICKET-005 — Add LICENSE file
 - **Priority:** P0
