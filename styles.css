@@ -39,7 +39,8 @@
 
 .pi-chat-domain:focus {
   outline: none;
-  border-color: var(--interactive-accent);
+  box-shadow: none;
+  border-color: var(--background-modifier-border-hover);
 }
 
 /* ─── Obsidian Pi — theme-safe CSS ──────────────────────────── */
