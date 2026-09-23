@@ -1,5 +1,7 @@
 # Obsidian Pi
 
+![CI](https://github.com/bighill/obsidian-pi/actions/workflows/ci.yml/badge.svg)
+
 A plugin that brings the [Pi CLI](https://github.com/mariozechner/pi-coding-agent) agent chat into an Obsidian tab. Ask Pi to read, edit, write, and run bash commands against your vault files without leaving Obsidian.
 
 > **Status:** early beta. The plugin can invoke file-system and shell tools; review the [Tool risks](#tool-risks) section before enabling it on important vaults.

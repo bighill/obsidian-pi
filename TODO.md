@@ -122,16 +122,17 @@
   - [x] Tests for `InlineSuggest` selection/movement logic
   - [x] `npm test` script added and passing
 
-### [ ] TICKET-010 — Add CI with GitHub Actions
+### [x] TICKET-010 — Add CI with GitHub Actions
 - **Priority:** P1
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** No continuous integration exists.
 - **Acceptance:**
-  - [ ] Workflow runs `npm install`, `npm run typecheck`, and `npm test` on every PR
-  - [ ] Workflow runs on Node versions matching Obsidian/Electron
-  - [ ] Workflow verifies `npm run build` succeeds
-  - [ ] Branch protection requires CI pass before merge
+  - [x] Workflow runs `npm install`, `npm run typecheck`, and `npm test` on every PR
+  - [x] Workflow runs on Node versions matching Obsidian/Electron
+  - [x] Workflow verifies `npm run build` succeeds
+  - [~] Branch protection requires CI pass before merge
+- **Notes:** Branch protection must be enabled in the GitHub repository settings (Settings → Branches → Add rule). The CI workflow is ready and will run on PRs.
 
 ---
 
