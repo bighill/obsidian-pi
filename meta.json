@@ -22,6 +22,38 @@
       ],
       "format": "esm"
     },
+    "src/path-utils.ts": {
+      "bytes": 514,
+      "imports": [
+        {
+          "path": "os",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "src/cwd-options.ts": {
+      "bytes": 1204,
+      "imports": [
+        {
+          "path": "fs",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src/path-utils.ts",
+          "kind": "import-statement",
+          "original": "./path-utils"
+        }
+      ],
+      "format": "esm"
+    },
     "src/inline-suggest.ts": {
       "bytes": 3119,
       "imports": [],
@@ -79403,7 +79435,7 @@
       "format": "esm"
     },
     "src/session-service.ts": {
-      "bytes": 2866,
+      "bytes": 3326,
       "imports": [
         {
           "path": "node_modules/@mariozechner/pi-coding-agent/dist/index.js",
@@ -79419,7 +79451,7 @@
       "format": "esm"
     },
     "src/pi-chat-view.ts": {
-      "bytes": 19054,
+      "bytes": 20652,
       "imports": [
         {
           "path": "obsidian",
@@ -79440,6 +79472,16 @@
           "path": "os",
           "kind": "import-statement",
           "external": true
+        },
+        {
+          "path": "src/path-utils.ts",
+          "kind": "import-statement",
+          "original": "./path-utils"
+        },
+        {
+          "path": "src/cwd-options.ts",
+          "kind": "import-statement",
+          "original": "./cwd-options"
         },
         {
           "path": "src/inline-suggest.ts",
@@ -79470,7 +79512,7 @@
       "format": "esm"
     },
     "src/settings-tab.ts": {
-      "bytes": 3317,
+      "bytes": 3438,
       "imports": [
         {
           "path": "obsidian",
@@ -79481,12 +79523,33 @@
           "path": "fs",
           "kind": "import-statement",
           "external": true
+        },
+        {
+          "path": "src/path-utils.ts",
+          "kind": "import-statement",
+          "original": "./path-utils"
+        }
+      ],
+      "format": "esm"
+    },
+    "src/cwd-switcher-modal.ts": {
+      "bytes": 980,
+      "imports": [
+        {
+          "path": "obsidian",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "src/cwd-options.ts",
+          "kind": "import-statement",
+          "original": "./cwd-options"
         }
       ],
       "format": "esm"
     },
     "src/main.ts": {
-      "bytes": 2771,
+      "bytes": 3049,
       "imports": [
         {
           "path": "src/sdk-runtime-init.ts",
@@ -79507,6 +79570,11 @@
           "path": "src/settings-tab.ts",
           "kind": "import-statement",
           "original": "./settings-tab"
+        },
+        {
+          "path": "src/cwd-switcher-modal.ts",
+          "kind": "import-statement",
+          "original": "./cwd-switcher-modal"
         }
       ],
       "format": "esm"
@@ -79517,7 +79585,7 @@
       "imports": [],
       "exports": [],
       "inputs": {},
-      "bytes": 7949204
+      "bytes": 7952212
     },
     "main.js": {
       "imports": [
@@ -80447,6 +80515,21 @@
           "external": true
         },
         {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
           "path": "obsidian",
           "kind": "require-call",
           "external": true
@@ -81318,6 +81401,11 @@
         },
         {
           "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "obsidian",
           "kind": "require-call",
           "external": true
         }
@@ -86999,10 +87087,10 @@
           "bytesInOutput": 3438
         },
         "node_modules/parse5/lib/common/foreign-content.js": {
-          "bytesInOutput": 5248
+          "bytesInOutput": 5253
         },
         "node_modules/parse5/lib/parser/index.js": {
-          "bytesInOutput": 43264
+          "bytesInOutput": 43284
         },
         "node_modules/parse5/lib/serializer/index.js": {
           "bytesInOutput": 2450
@@ -87368,7 +87456,7 @@
           "bytesInOutput": 3144
         },
         "src/main.ts": {
-          "bytesInOutput": 1380
+          "bytesInOutput": 1513
         },
         "src/sdk-runtime.ts": {
           "bytesInOutput": 1159
@@ -87377,7 +87465,13 @@
           "bytesInOutput": 11
         },
         "src/pi-chat-view.ts": {
-          "bytesInOutput": 11055
+          "bytesInOutput": 11994
+        },
+        "src/path-utils.ts": {
+          "bytesInOutput": 207
+        },
+        "src/cwd-options.ts": {
+          "bytesInOutput": 400
         },
         "src/inline-suggest.ts": {
           "bytesInOutput": 1578
@@ -90050,13 +90144,16 @@
           "bytesInOutput": 720
         },
         "src/session-service.ts": {
-          "bytesInOutput": 936
+          "bytesInOutput": 1150
         },
         "src/settings-tab.ts": {
-          "bytesInOutput": 2052
+          "bytesInOutput": 2068
+        },
+        "src/cwd-switcher-modal.ts": {
+          "bytesInOutput": 504
         }
       },
-      "bytes": 7059870
+      "bytes": 7062308
     }
   }
 }

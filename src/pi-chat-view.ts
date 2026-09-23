@@ -10,6 +10,8 @@ import type ObsidianPiPlugin from './main'
 import { type AgentSessionEvent } from '@mariozechner/pi-coding-agent'
 import { join } from 'path'
 import { homedir } from 'os'
+import { expandHome } from './path-utils'
+import { currentCwdLabel, listCwdOptions } from './cwd-options'
 import { InlineSuggest, type SuggestItem } from './inline-suggest'
 import {
   detectMention,
@@ -45,6 +47,7 @@ export class PiChatView extends ItemView {
   private retryBtn!: HTMLElement
   private clearBtn!: HTMLElement
   private contextEl!: HTMLElement
+  private domainSelect!: HTMLSelectElement
   private contextUpdateInterval: number | null = null
   private messages: ChatMessage[] = []
   private isStreaming = false
@@ -89,6 +92,13 @@ export class PiChatView extends ItemView {
     const header = wrapper.createDiv('pi-chat-header')
     const titleEl = header.createDiv('pi-chat-title')
     titleEl.setText('Pi')
+
+    this.domainSelect = header.createEl('select', { cls: 'pi-chat-domain' })
+    this.registerDomEvent(this.domainSelect, 'change', () => {
+      void this.handleCwdChange()
+    })
+    this.refreshCwdSelect()
+
     this.contextEl = header.createDiv('pi-chat-context')
     this.contextEl.setText('')
     this.statusEl = header.createDiv('pi-chat-status')
@@ -103,10 +113,10 @@ export class PiChatView extends ItemView {
 
     this.clearBtn = header.createDiv('pi-chat-clear')
     setIcon(this.clearBtn, 'trash-2')
-    this.clearBtn.setAttribute('aria-label', 'Clear chat history')
+    this.clearBtn.setAttribute('aria-label', 'Start new session')
     this.clearBtn.addClass('is-hidden')
     this.registerDomEvent(this.clearBtn, 'click', () => {
-      void this.clearViewHistory()
+      void this.startNewSession()
     })
 
     // Messages container
@@ -199,17 +209,14 @@ export class PiChatView extends ItemView {
     await this.initSession()
   }
 
-  private async initSession() {
+  private async initSession(reason: 'initial' | 'cwd-change' = 'initial') {
     try {
       this.statusEl.setText('Starting session…')
       this.statusEl.setAttribute('title', '')
       this.statusEl.addClass('pi-chat-status-busy')
       this.statusEl.removeClass('pi-chat-status-ready', 'pi-chat-status-error')
 
-      const adapter = this.app.vault.adapter
-      const cwd =
-        this.plugin.settings.workingDir ||
-        (adapter instanceof FileSystemAdapter ? adapter.getBasePath() : process.cwd())
+      const cwd = this.getEffectiveCwd()
       const agentDir = join(homedir(), '.pi', 'agent')
 
       const session = await this.sessionService.start(
@@ -218,6 +225,7 @@ export class PiChatView extends ItemView {
           agentDir,
           thinkingLevel: this.plugin.settings.thinkingLevel || undefined,
           model: this.plugin.settings.model || undefined,
+          reason,
         },
         (event: AgentSessionEvent) => this.handleSessionEvent(event),
       )
@@ -229,6 +237,7 @@ export class PiChatView extends ItemView {
       this.statusEl.addClass('pi-chat-status-ready')
       this.statusEl.removeClass('pi-chat-status-error')
       this.retryBtn.addClass('is-hidden')
+      this.refreshCwdSelect()
       this.restoreHistory()
       this.startContextPoller()
     } catch (err) {
@@ -297,9 +306,10 @@ export class PiChatView extends ItemView {
     this.updateClearButton()
   }
 
-  private async clearViewHistory(): Promise<void> {
+  private async startNewSession(): Promise<void> {
     this.clearMessages()
     await this.plugin.clearHistory()
+    await this.restartSession()
   }
 
   async persistHistory(): Promise<void> {
@@ -577,7 +587,7 @@ export class PiChatView extends ItemView {
     }
   }
 
-  async restartSession(): Promise<void> {
+  async restartSession(reason: 'initial' | 'cwd-change' = 'initial'): Promise<void> {
     this.stopContextPoller()
     this.sessionService.stop()
     this.currentAssistantText = ''
@@ -585,7 +595,46 @@ export class PiChatView extends ItemView {
     this.isStreaming = false
     this.updateSendButton()
     this.retryBtn?.addClass('is-hidden')
-    await this.initSession()
+    await this.initSession(reason)
+  }
+
+  private refreshCwdSelect(): void {
+    if (!this.domainSelect) return
+    const currentCwd = this.getEffectiveCwd()
+    const options = listCwdOptions(currentCwd)
+
+    this.domainSelect.empty()
+    this.domainSelect.createEl('option', {
+      text: currentCwdLabel(currentCwd),
+      value: currentCwd,
+    })
+    for (const option of options) {
+      this.domainSelect.createEl('option', { text: option.label, value: option.value })
+    }
+    this.domainSelect.value = currentCwd
+  }
+
+  private async handleCwdChange(): Promise<void> {
+    const newCwd = this.domainSelect.value
+    if (newCwd === this.getEffectiveCwd()) return
+    this.plugin.settings.workingDir = newCwd === this.getDefaultCwd() ? '' : newCwd
+    await this.plugin.saveSettings()
+    await this.restartSession('cwd-change')
+  }
+
+  private getEffectiveCwd(): string {
+    return (
+      expandHome(this.plugin.settings.workingDir) ||
+      (this.app.vault.adapter instanceof FileSystemAdapter
+        ? this.app.vault.adapter.getBasePath()
+        : process.cwd())
+    )
+  }
+
+  private getDefaultCwd(): string {
+    return this.app.vault.adapter instanceof FileSystemAdapter
+      ? this.app.vault.adapter.getBasePath()
+      : process.cwd()
   }
 
   async onClose() {

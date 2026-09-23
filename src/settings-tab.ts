@@ -1,6 +1,7 @@
 import { App, Notice, PluginSettingTab, Setting } from 'obsidian'
 import { statSync } from 'fs'
 import type ObsidianPiPlugin from './main'
+import { collapseHome, expandHome } from './path-utils'
 
 export class PiPluginSettingTab extends PluginSettingTab {
   plugin: ObsidianPiPlugin
@@ -39,16 +40,17 @@ export class PiPluginSettingTab extends PluginSettingTab {
       .addText((text) => {
         text
           .setPlaceholder('/path/to/project')
-          .setValue(this.plugin.settings.workingDir)
+          .setValue(collapseHome(this.plugin.settings.workingDir))
           .onChange(async (value) => {
             const trimmed = value.trim()
-            if (trimmed && !this.isValidDir(trimmed)) {
+            const expanded = expandHome(trimmed)
+            if (trimmed && !this.isValidDir(expanded)) {
               new Notice(`Working directory is not a valid directory: ${trimmed}`)
               text.inputEl.addClass('pi-setting-invalid')
               return
             }
             text.inputEl.removeClass('pi-setting-invalid')
-            this.plugin.settings.workingDir = trimmed
+            this.plugin.settings.workingDir = expanded
             await this.plugin.saveSettings()
             await this.plugin.restartChatSessions()
           })

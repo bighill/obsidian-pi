@@ -4,6 +4,7 @@ import './sdk-runtime-init'
 import { Plugin, WorkspaceLeaf } from 'obsidian'
 import { PiChatView, VIEW_TYPE_PI_CHAT } from './pi-chat-view'
 import { PiPluginSettingTab } from './settings-tab'
+import { CwdSwitcherModal } from './cwd-switcher-modal'
 import type { CreateAgentSessionOptions } from '@mariozechner/pi-coding-agent'
 import type { ChatMessage } from './message-renderer'
 
@@ -44,6 +45,12 @@ export default class ObsidianPiPlugin extends Plugin {
       name: 'Open Pi Chat',
       callback: () => this.activateView(),
     })
+
+    this.addCommand({
+      id: 'switch-pi-working-dir',
+      name: 'Switch working directory',
+      callback: () => new CwdSwitcherModal(this.app, this).open(),
+    })
   }
 
   async activateView() {
@@ -56,11 +63,11 @@ export default class ObsidianPiPlugin extends Plugin {
     workspace.revealLeaf(leaf)
   }
 
-  async restartChatSessions(): Promise<void> {
+  async restartChatSessions(reason: 'initial' | 'cwd-change' = 'initial'): Promise<void> {
     for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE_PI_CHAT)) {
       const view = leaf.view
       if (view instanceof PiChatView) {
-        await view.restartSession()
+        await view.restartSession(reason)
       }
     }
   }
