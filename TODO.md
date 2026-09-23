@@ -159,14 +159,14 @@
   - [ ] Cancel aborts the current SDK prompt if supported
   - [ ] UI returns to idle state safely
 
-### [ ] TICKET-013 — Use Obsidian lifecycle APIs for DOM events
+### [x] TICKET-013 — Use Obsidian lifecycle APIs for DOM events
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** Raw `addEventListener` is used for keyboard, click, and blur handlers.
 - **Acceptance:**
-  - [ ] Replace raw listeners with `this.registerDomEvent`
-  - [ ] Ensure listeners are cleaned up on `onClose`
+  - [x] Replace raw listeners with `this.registerDomEvent`
+  - [x] Ensure listeners are cleaned up on `onClose`
 
 ### [ ] TICKET-014 — Harden file attachment handling
 - **Priority:** P2

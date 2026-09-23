@@ -23,7 +23,7 @@
       "format": "esm"
     },
     "src/inline-suggest.ts": {
-      "bytes": 2470,
+      "bytes": 3138,
       "imports": [],
       "format": "esm"
     },
@@ -79419,7 +79419,7 @@
       "format": "esm"
     },
     "src/pi-chat-view.ts": {
-      "bytes": 15761,
+      "bytes": 15825,
       "imports": [
         {
           "path": "obsidian",
@@ -87371,10 +87371,10 @@
           "bytesInOutput": 11
         },
         "src/pi-chat-view.ts": {
-          "bytesInOutput": 8604
+          "bytesInOutput": 8662
         },
         "src/inline-suggest.ts": {
-          "bytesInOutput": 1497
+          "bytesInOutput": 1578
         },
         "src/at-mention.ts": {
           "bytesInOutput": 1592
@@ -90050,7 +90050,7 @@
           "bytesInOutput": 1672
         }
       },
-      "bytes": 7055387
+      "bytes": 7055526
     }
   }
 }

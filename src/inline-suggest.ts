@@ -10,9 +10,28 @@ export class InlineSuggest {
   private items: SuggestItem[] = []
   private selectedIndex = 0
   private open = false
+  private registerDomEvent: <K extends keyof HTMLElementEventMap>(
+    el: HTMLElement,
+    type: K,
+    callback: (this: HTMLElement, ev: HTMLElementEventMap[K]) => unknown,
+    options?: boolean | AddEventListenerOptions,
+  ) => void
   onChoose: (item: SuggestItem) => void = () => {}
 
-  constructor(host: HTMLElement) {
+  constructor(
+    host: HTMLElement,
+    registerDomEvent?: <K extends keyof HTMLElementEventMap>(
+      el: HTMLElement,
+      type: K,
+      callback: (this: HTMLElement, ev: HTMLElementEventMap[K]) => unknown,
+      options?: boolean | AddEventListenerOptions,
+    ) => void,
+  ) {
+    this.registerDomEvent =
+      registerDomEvent ??
+      ((el, type, callback) => {
+        el.addEventListener(type, callback as EventListener)
+      })
     this.containerEl = host.createDiv('pi-chat-suggest')
     this.containerEl.addClass('is-hidden')
     this.listEl = this.containerEl.createDiv('pi-chat-suggest-list')
@@ -80,11 +99,11 @@ export class InlineSuggest {
           text: item.description,
         })
       }
-      row.addEventListener('mousedown', (e) => {
+      this.registerDomEvent(row, 'mousedown', (e: MouseEvent) => {
         e.preventDefault()
         this.onChoose(item)
       })
-      row.addEventListener('mouseenter', () => {
+      this.registerDomEvent(row, 'mouseenter', () => {
         this.selectedIndex = i
         this.render()
       })

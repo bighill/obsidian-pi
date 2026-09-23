@@ -93,7 +93,7 @@ export class PiChatView extends ItemView {
     setIcon(this.retryBtn, 'refresh-cw')
     this.retryBtn.setAttribute('aria-label', 'Retry connection')
     this.retryBtn.addClass('is-hidden')
-    this.retryBtn.addEventListener('click', () => {
+    this.registerDomEvent(this.retryBtn, 'click', () => {
       void this.restartSession()
     })
 
@@ -112,7 +112,7 @@ export class PiChatView extends ItemView {
       },
     })
     // @-mention file picker dropdown (anchored to the input area)
-    this.suggest = new InlineSuggest(inputArea)
+    this.suggest = new InlineSuggest(inputArea, this.registerDomEvent.bind(this))
     this.suggest.onChoose = (item) => void this.chooseMention(item)
 
     this.sendBtn = inputArea.createEl('button', {
@@ -121,8 +121,8 @@ export class PiChatView extends ItemView {
     setIcon(this.sendBtn, 'send-horizontal')
 
     // ─── Event handlers ─────────────────────────────────────
-    this.sendBtn.addEventListener('click', () => this.handleSend())
-    this.inputEl.addEventListener('keydown', (e: KeyboardEvent) => {
+    this.registerDomEvent(this.sendBtn, 'click', () => this.handleSend())
+    this.registerDomEvent(this.inputEl, 'keydown', (e: KeyboardEvent) => {
       // @-mention dropdown captures navigation keys while open
       if (this.suggest.isOpen) {
         if (e.key === 'ArrowDown') {
@@ -154,14 +154,14 @@ export class PiChatView extends ItemView {
         this.handleSend()
       }
     })
-    this.inputEl.addEventListener('input', () => {
+    this.registerDomEvent(this.inputEl, 'input', () => {
       this.inputEl.style.height = 'auto'
       this.inputEl.style.height =
         Math.min(this.inputEl.scrollHeight, 200) + 'px'
       this.updateMentionSuggest()
       this.reconcileInlineMentions()
     })
-    this.inputEl.addEventListener('blur', () => {
+    this.registerDomEvent(this.inputEl, 'blur', () => {
       if (this.suggest.isOpen) this.closeMentionSuggest()
     })
 
