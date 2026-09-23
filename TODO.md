@@ -197,14 +197,14 @@
   - [x] Consider tooltip with full model name / context details
   - [x] Busy/error states visually distinct
 
-### [ ] TICKET-017 — Add source maps for production build
+### [x] TICKET-017 — Add source maps for production build
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** Production bundle has no source maps, making user support hard.
 - **Acceptance:**
-  - [ ] `build` emits external source maps
-  - [ ] Source maps excluded from npm tarball if desired, or included for GitHub releases
+  - [x] `build` emits external source maps
+  - [x] Source maps excluded from npm tarball if desired, or included for GitHub releases
 
 ---
 
