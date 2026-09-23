@@ -7,7 +7,10 @@
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint src",
+    "format": "prettier --write \"src/**/*.ts\" \"*.mjs\" \"*.json\" \"*.css\" \"*.md\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"*.mjs\" \"*.json\" \"*.css\" \"*.md\""
   },
   "keywords": [
     "obsidian",
@@ -19,11 +22,16 @@
   "author": "bighill",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.6",
     "esbuild": "^0.28.2",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
     "jsdom": "^30.1.1",
     "obsidian": "^1.12.3",
+    "prettier": "^3.9.8",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.70.1",
     "vitest": "^5.0.1"
   },
   "dependencies": {
