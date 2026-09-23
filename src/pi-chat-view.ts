@@ -7,15 +7,7 @@ import {
   FileSystemAdapter,
 } from 'obsidian'
 import type ObsidianPiPlugin from './main'
-import {
-  createAgentSession,
-  DefaultResourceLoader,
-  AuthStorage,
-  ModelRegistry,
-  type AgentSession,
-  type AgentSessionEvent,
-  type CreateAgentSessionOptions,
-} from '@mariozechner/pi-coding-agent'
+import { type AgentSessionEvent } from '@mariozechner/pi-coding-agent'
 import { join } from 'path'
 import { homedir } from 'os'
 import { InlineSuggest, type SuggestItem } from './inline-suggest'
@@ -36,13 +28,13 @@ import {
   type ToolCallInfo,
   type ToolState,
 } from './message-renderer'
+import { PiSessionService } from './session-service'
 
 export const VIEW_TYPE_PI_CHAT = 'pi-chat'
 
 export class PiChatView extends ItemView {
   plugin: ObsidianPiPlugin
-  private session: AgentSession | null = null
-  private unsubscribe: (() => void) | null = null
+  private sessionService: PiSessionService
   private messagesEl!: HTMLElement
   private inputEl!: HTMLTextAreaElement
   private sendBtn!: HTMLButtonElement
@@ -66,6 +58,7 @@ export class PiChatView extends ItemView {
   constructor(leaf: WorkspaceLeaf, plugin: ObsidianPiPlugin) {
     super(leaf)
     this.plugin = plugin
+    this.sessionService = new PiSessionService()
   }
 
   getViewType(): string {
@@ -197,60 +190,17 @@ export class PiChatView extends ItemView {
           : process.cwd())
       const agentDir = join(homedir(), '.pi', 'agent')
 
-      const resourceLoader = new DefaultResourceLoader({
-        cwd,
-        agentDir,
-        appendSystemPrompt: [
-          `Current timestamp: ${new Date().toISOString()}`,
-        ],
-      })
-      await resourceLoader.reload()
+      const session = await this.sessionService.start(
+        {
+          cwd,
+          agentDir,
+          thinkingLevel: this.plugin.settings.thinkingLevel || undefined,
+          model: this.plugin.settings.model || undefined,
+        },
+        (event: AgentSessionEvent) => this.handleSessionEvent(event),
+      )
 
-      const options: CreateAgentSessionOptions = {
-        cwd,
-        agentDir,
-        resourceLoader,
-      }
-
-      // Apply settings overrides if set
-      if (this.plugin.settings.thinkingLevel) {
-        options.thinkingLevel = this.plugin.settings.thinkingLevel
-      }
-
-      if (this.plugin.settings.model) {
-        const modelSetting = this.plugin.settings.model
-        const colonIndex = modelSetting.indexOf(':')
-        if (colonIndex > 0 && colonIndex < modelSetting.length - 1) {
-          const provider = modelSetting.slice(0, colonIndex)
-          const modelId = modelSetting.slice(colonIndex + 1)
-          const authStorage = AuthStorage.create(join(agentDir, 'auth.json'))
-          const modelRegistry = ModelRegistry.create(
-            authStorage,
-            join(agentDir, 'models.json'),
-          )
-          const model = modelRegistry.find(provider, modelId)
-          if (model) {
-            options.model = model
-          } else {
-            throw new Error(`Model not found: ${modelSetting}`)
-          }
-        } else {
-          throw new Error(
-            `Model must be in "provider:modelId" format: ${modelSetting}`,
-          )
-        }
-      }
-
-      const result = await createAgentSession(options)
-      this.session = result.session
-
-      // Subscribe to events
-      this.unsubscribe = this.session.subscribe((event: AgentSessionEvent) => {
-        this.handleSessionEvent(event)
-      })
-
-      const model = this.session.model
-      const modelLabel = model ? model.name : 'Ready'
+      const modelLabel = session.model ? session.model.name : 'Ready'
       this.statusEl.setText(modelLabel)
       this.statusEl.removeClass('pi-chat-status-busy')
       this.statusEl.addClass('pi-chat-status-ready')
@@ -276,8 +226,9 @@ export class PiChatView extends ItemView {
   }
 
   private updateContextDisplay(): void {
-    if (!this.session || !this.contextEl) return
-    const usage = this.session.getContextUsage()
+    const session = this.sessionService.getSession()
+    if (!session || !this.contextEl) return
+    const usage = session.getContextUsage()
     if (!usage || usage.percent == null) {
       this.contextEl.setText('')
       this.contextEl.removeAttribute('title')
@@ -394,9 +345,10 @@ export class PiChatView extends ItemView {
   }
 
   private async handleSend() {
+    const session = this.sessionService.getSession()
     const text = this.inputEl.value.trim()
     const hasAttachments = this.pendingAttachments.length > 0
-    if ((!text && !hasAttachments) || this.isStreaming || !this.session) return
+    if ((!text && !hasAttachments) || this.isStreaming || !session) return
 
     // Build full message with inline file attachments and collect images
     let fullMessage = text
@@ -431,7 +383,7 @@ export class PiChatView extends ItemView {
     try {
       const options: { images?: ImageContent[] } =
         images.length > 0 ? { images } : {}
-      await this.session.prompt(fullMessage, options)
+      await session.prompt(fullMessage, options)
     } catch (err) {
       this.messages.push({
         role: 'system',
@@ -547,9 +499,7 @@ export class PiChatView extends ItemView {
 
   async restartSession(): Promise<void> {
     this.stopContextPoller()
-    this.unsubscribe?.()
-    this.unsubscribe = null
-    this.session = null
+    this.sessionService.stop()
     this.currentAssistantText = ''
     this.currentToolCalls.clear()
     this.isStreaming = false
@@ -560,8 +510,6 @@ export class PiChatView extends ItemView {
 
   async onClose() {
     this.stopContextPoller()
-    this.unsubscribe?.()
-    this.unsubscribe = null
-    this.session = null
+    this.sessionService.stop()
   }
 }
