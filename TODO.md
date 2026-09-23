@@ -89,14 +89,14 @@
   - [ ] Open upstream request for a slimmer SDK export if needed
   - [ ] Target bundle size documented (e.g., < 1 MB compressed)
 
-### [ ] TICKET-007 — Refactor `pi-chat-view.ts` into smaller modules
+### [~] TICKET-007 — Refactor `pi-chat-view.ts` into smaller modules
 - **Priority:** P1
-- **Status:** Open
+- **Status:** In Progress
 - **Owner:** unassigned
 - **Description:** File is 650+ lines and mixes session management, DOM rendering, streaming logic, file attachments, and mention UI.
 - **Acceptance:**
   - [ ] Extract `PiSessionService` to wrap `createAgentSession`, `DefaultResourceLoader`, and event subscription
-  - [ ] Extract attachment helpers into `src/attachments.ts`
+  - [x] Extract attachment helpers into `src/attachments.ts`
   - [ ] Extract message/tool rendering into `src/message-renderer.ts`
   - [ ] `PiChatView` remains focused on view lifecycle and user input only
 

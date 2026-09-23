@@ -4,9 +4,7 @@ import {
   WorkspaceLeaf,
   setIcon,
   TFile,
-  arrayBufferToBase64,
   prepareFuzzySearch,
-  Notice,
   FileSystemAdapter,
 } from 'obsidian'
 import type ObsidianPiPlugin from './main'
@@ -23,15 +21,17 @@ import { join } from 'path'
 import { homedir } from 'os'
 import { InlineSuggest, type SuggestItem } from './inline-suggest'
 import {
-  classifyFile,
   detectMention,
-  formatTextAttachment,
-  imageMimeFromExt,
   rankMentions,
   reconcileMentions,
   replaceMention,
   splitFileBlocks,
 } from './at-mention'
+import {
+  createAttachmentFromFile,
+  type ImageContent,
+  type PendingAttachment,
+} from './attachments'
 
 export const VIEW_TYPE_PI_CHAT = 'pi-chat'
 
@@ -46,12 +46,6 @@ interface ToolCallInfo {
   args: string
   result?: string
   isError?: boolean
-}
-
-interface ImageContent {
-  type: 'image'
-  data: string
-  mimeType: string
 }
 
 export class PiChatView extends ItemView {
@@ -73,13 +67,7 @@ export class PiChatView extends ItemView {
   private toggledToolCalls: Set<string> = new Set()
   private suggest!: InlineSuggest
   private activeMention: { query: string; start: number } | null = null
-  private pendingAttachments: {
-    name: string
-    content?: string
-    token?: string
-    inline?: boolean
-    image?: ImageContent
-  }[] = []
+  private pendingAttachments: PendingAttachment[] = []
 
   constructor(leaf: WorkspaceLeaf, plugin: ObsidianPiPlugin) {
     super(leaf)
@@ -656,30 +644,11 @@ export class PiChatView extends ItemView {
     if (mention) this.insertMentionText(mention, token)
 
     try {
-      const base = { name: file.name, inline: true, token }
-      const kind = classifyFile(file.name)
-      if (kind === 'image') {
-        const data = arrayBufferToBase64(await this.app.vault.readBinary(file))
-        const mimeType = imageMimeFromExt(file.extension)
-        this.pendingAttachments.push({
-          ...base,
-          image: { type: 'image', data, mimeType },
-        })
-      } else if (kind === 'text') {
-        const content = await this.app.vault.read(file)
-        this.pendingAttachments.push({
-          ...base,
-          content: formatTextAttachment(file.path, content),
-        })
-      } else {
-        this.pendingAttachments.push({
-          ...base,
-          content: `[Attached file: ${file.name}]`,
-        })
-      }
+      const attachment = await createAttachmentFromFile(this.app.vault, file)
+      this.pendingAttachments.push(attachment)
       this.updateSendButton()
     } catch (e) {
-      new Notice(`Failed to attach ${file.name}: ${e}`)
+      // Error notice is shown by createAttachmentFromFile
     }
   }
 
