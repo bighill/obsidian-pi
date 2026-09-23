@@ -12,6 +12,7 @@ export interface ChatMessage {
 
 /** Tool call metadata produced by the SDK and rendered in the UI. */
 export interface ToolCallInfo {
+  id?: string
   name: string
   args: string
   result?: string
@@ -72,13 +73,8 @@ export class MessageRenderer {
       if (msg.toolCalls) {
         for (let j = 0; j < msg.toolCalls.length; j++) {
           const tc = msg.toolCalls[j]
-          this.createToolCallEl(
-            msgEl,
-            tc,
-            `history-${i}-${j}`,
-            false,
-            state,
-          )
+          const id = tc.id ?? `history-${i}-${j}`
+          this.createToolCallEl(msgEl, tc, id, false, state)
         }
       }
     }

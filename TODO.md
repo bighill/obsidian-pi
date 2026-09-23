@@ -178,14 +178,14 @@
   - [x] Replace regex-based round-trip with structured attachment metadata
   - [x] Async file reading does not block UI for large files
 
-### [ ] TICKET-015 — Improve tool-call rendering identity
+### [x] TICKET-015 — Improve tool-call rendering identity
 - **Priority:** P2
-- **Status:** Open
+- **Status:** Done
 - **Owner:** unassigned
 - **Description:** Tool-call IDs in history are built from message index (`history-${i}-${j}`), which can collide across re-renders.
 - **Acceptance:**
-  - [ ] Use SDK-provided `toolCallId` as the stable key when available
-  - [ ] Toggle state keyed by stable IDs
+  - [x] Use SDK-provided `toolCallId` as the stable key when available
+  - [x] Toggle state keyed by stable IDs
 
 ### [ ] TICKET-016 — Improve status/context header UX
 - **Priority:** P2

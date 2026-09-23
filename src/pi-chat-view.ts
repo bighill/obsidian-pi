@@ -342,6 +342,7 @@ export class PiChatView extends ItemView {
 
       case 'tool_execution_start': {
         const toolCall: ToolCallInfo = {
+          id: event.toolCallId,
           name: event.toolName,
           args: JSON.stringify(event.args, null, 2),
         }
@@ -375,7 +376,9 @@ export class PiChatView extends ItemView {
 
       case 'turn_end': {
         // Finalize the assistant message
-        const toolCalls = Array.from(this.currentToolCalls.values())
+        const toolCalls = Array.from(this.currentToolCalls.entries()).map(
+          ([id, tc]) => ({ ...tc, id }),
+        )
         this.messages.push({
           role: 'assistant',
           text: this.currentAssistantText,
