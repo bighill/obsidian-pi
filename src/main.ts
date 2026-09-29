@@ -57,11 +57,8 @@ export default class ObsidianPiPlugin extends Plugin {
 
   async activateView() {
     const { workspace } = this.app
-    let leaf = workspace.getLeavesOfType(VIEW_TYPE_PI_CHAT)[0]
-    if (!leaf) {
-      leaf = workspace.getLeaf('tab')
-      await leaf.setViewState({ type: VIEW_TYPE_PI_CHAT, active: true })
-    }
+    const leaf = workspace.getLeaf('tab')
+    await leaf.setViewState({ type: VIEW_TYPE_PI_CHAT, active: true })
     workspace.revealLeaf(leaf)
   }
 

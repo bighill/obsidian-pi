@@ -62,6 +62,7 @@ export class PiChatView extends ItemView {
   private suggest!: InlineSuggest
   private activeMention: { query: string; start: number } | null = null
   private pendingAttachments: PendingAttachment[] = []
+  private tabTitle = 'Pi'
 
   constructor(leaf: WorkspaceLeaf, plugin: ObsidianPiPlugin) {
     super(leaf)
@@ -74,7 +75,7 @@ export class PiChatView extends ItemView {
   }
 
   getDisplayText(): string {
-    return 'Pi Chat'
+    return this.tabTitle
   }
 
   getIcon(): string {
@@ -221,6 +222,7 @@ export class PiChatView extends ItemView {
 
     // ─── Init session ────────────────────────────────────────
     await this.initSession()
+    this.updateTabTitle()
   }
 
   private async initSession(reason: 'initial' | 'cwd-change' = 'initial') {
@@ -253,7 +255,6 @@ export class PiChatView extends ItemView {
       this.retryBtn.addClass('is-hidden')
       this.refreshCwdSelect()
       this.refreshFocusToggle()
-      this.restoreHistory()
       this.startContextPoller()
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
@@ -313,22 +314,13 @@ export class PiChatView extends ItemView {
     }
   }
 
-  private restoreHistory(): void {
-    if (!this.plugin.settings.saveHistory) return
-    const saved = this.plugin.settings.history
-    if (saved && saved.length > 0) {
-      this.messages = JSON.parse(JSON.stringify(saved))
-      this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
-      this.updateClearButton()
-    }
-  }
-
   clearMessages(): void {
     this.messages = []
     this.currentAssistantText = ''
     this.currentToolCalls.clear()
     this.renderer.renderMessages(this.messagesEl, [], this.toolState)
     this.updateClearButton()
+    this.updateTabTitle()
   }
 
   private async startNewSession(): Promise<void> {
@@ -347,6 +339,22 @@ export class PiChatView extends ItemView {
     } else {
       this.clearBtn.addClass('is-hidden')
     }
+  }
+
+  private updateTabTitle(): void {
+    const lastUser = [...this.messages].reverse().find((m) => m.role === 'user')
+    if (lastUser?.text) {
+      const preview = lastUser.text
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 30)
+        .trim()
+      const ellipsis = lastUser.text.length > 30 ? '...' : ''
+      this.tabTitle = `Pi — ${preview}${ellipsis}`
+    } else {
+      this.tabTitle = 'Pi'
+    }
+    ;(this.leaf as any).updateHeader?.()
   }
 
   private handleSessionEvent(event: AgentSessionEvent) {
@@ -481,6 +489,7 @@ export class PiChatView extends ItemView {
     })
     this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
     this.updateClearButton()
+    this.updateTabTitle()
     await this.persistHistory()
 
     // Send to Pi
@@ -494,6 +503,7 @@ export class PiChatView extends ItemView {
       })
       this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
       this.updateClearButton()
+      this.updateTabTitle()
       await this.persistHistory()
       this.isStreaming = false
       this.updateSendButton()

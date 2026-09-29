@@ -1,8 +1,7 @@
 import {
   createAgentSession,
   DefaultResourceLoader,
-  AuthStorage,
-  ModelRegistry,
+  ModelRuntime,
   type AgentSession,
   type AgentSessionEvent,
   type CreateAgentSessionOptions,
@@ -66,12 +65,12 @@ export class PiSessionService {
       if (colonIndex > 0 && colonIndex < modelSetting.length - 1) {
         const provider = modelSetting.slice(0, colonIndex)
         const modelId = modelSetting.slice(colonIndex + 1)
-        const authStorage = AuthStorage.create(join(options.agentDir, 'auth.json'))
-        const modelRegistry = ModelRegistry.create(
-          authStorage,
-          join(options.agentDir, 'models.json'),
-        )
-        const model = modelRegistry.find(provider, modelId)
+        const modelRuntime = await ModelRuntime.create({
+          authPath: join(options.agentDir, 'auth.json'),
+          modelsPath: join(options.agentDir, 'models.json'),
+          refreshOnCreate: false,
+        })
+        const model = modelRuntime.getModel(provider, modelId)
         if (model) {
           createOptions.model = model
         } else {
