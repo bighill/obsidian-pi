@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/bighill/obsidian-pi/actions/workflows/ci.yml/badge.svg)
 
-A plugin that brings the [Pi CLI](https://github.com/mariozechner/pi-coding-agent) agent chat into an Obsidian tab. Ask Pi to read, edit, write, and run bash commands against your vault files without leaving Obsidian.
+A plugin that brings the [Pi CLI](https://github.com/earendil-works/pi) agent chat into an Obsidian tab. Ask Pi to read, edit, write, and run bash commands against your vault files without leaving Obsidian.
 
 > **Status:** early beta. The plugin can invoke file-system and shell tools; review the [Tool risks](#tool-risks) section before enabling it on important vaults.
 
@@ -39,7 +39,7 @@ Obsidian Pi uses the bundled Pi SDK, which expects the same configuration as the
 
 - **Agent directory:** `~/.pi/agent` is used by default. The directory is created by the Pi CLI on first run.
 - **Model / provider settings:** stored in `~/.pi/agent/models.json` and the Pi CLI config.
-- **API keys:** add them via the Pi CLI (`pi auth` / `pi-ai` OAuth/API-key commands) or by editing `~/.pi/agent/auth.json`. The Obsidian plugin does not ask for or store API keys itself.
+- **API keys:** add them via the Pi CLI (`pi auth` or the interactive `/login` command) or by editing `~/.pi/agent/auth.json`. The Obsidian plugin does not ask for or store API keys itself.
 
 If no model is selected, the Pi SDK picks the first available configured model.
 

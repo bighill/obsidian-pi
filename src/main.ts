@@ -5,7 +5,7 @@ import { Plugin, WorkspaceLeaf } from 'obsidian'
 import { PiChatView, VIEW_TYPE_PI_CHAT } from './pi-chat-view'
 import { PiPluginSettingTab } from './settings-tab'
 import { CwdSwitcherModal } from './cwd-switcher-modal'
-import type { CreateAgentSessionOptions } from '@mariozechner/pi-coding-agent'
+import type { CreateAgentSessionOptions } from '@earendil-works/pi-coding-agent'
 import type { ChatMessage } from './message-renderer'
 
 type ThinkingLevel = NonNullable<CreateAgentSessionOptions['thinkingLevel']>

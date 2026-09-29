@@ -45,6 +45,6 @@
     "vitest": "^5.0.1"
   },
   "dependencies": {
-    "@mariozechner/pi-coding-agent": "^0.73.1"
+    "@earendil-works/pi-coding-agent": "^0.79.10"
   }
 }

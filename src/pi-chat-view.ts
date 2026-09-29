@@ -7,7 +7,7 @@ import {
   FileSystemAdapter,
 } from 'obsidian'
 import type ObsidianPiPlugin from './main'
-import { type AgentSessionEvent } from '@mariozechner/pi-coding-agent'
+import { type AgentSessionEvent } from '@earendil-works/pi-coding-agent'
 import { join } from 'path'
 import { homedir } from 'os'
 import { expandHome } from './path-utils'

@@ -6,7 +6,7 @@ import {
   type AgentSession,
   type AgentSessionEvent,
   type CreateAgentSessionOptions,
-} from '@mariozechner/pi-coding-agent'
+} from '@earendil-works/pi-coding-agent'
 import { join } from 'path'
 
 export interface SessionStartOptions {
@@ -46,10 +46,7 @@ export class PiSessionService {
     const resourceLoader = new DefaultResourceLoader({
       cwd: options.cwd,
       agentDir: options.agentDir,
-      appendSystemPrompt: [
-        `Current timestamp: ${new Date().toISOString()}`,
-        focusMessage,
-      ],
+      appendSystemPrompt: [`Current timestamp: ${new Date().toISOString()}`, focusMessage],
     })
     await resourceLoader.reload()
 
