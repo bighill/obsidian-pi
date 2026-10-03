@@ -1,6 +1,6 @@
 // Minimal DOM helpers that mirror Obsidian's HTMLElement extensions for tests.
 
-function polyfill(name: string, fn: (...args: unknown[]) => unknown) {
+function polyfill(name: string, fn: (this: HTMLElement, ...args: any[]) => unknown) {
   if (!(name in HTMLElement.prototype)) {
     Object.defineProperty(HTMLElement.prototype, name, {
       value: fn,
