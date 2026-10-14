@@ -264,7 +264,8 @@
   align-self: flex-start;
   background: var(--background-secondary);
   color: var(--text-normal);
-  border: 1px solid var(--background-modifier-border);
+  /* Test: no border on assistant bubbles */
+  border: none;
   border-bottom-left-radius: 2px;
 }
 
