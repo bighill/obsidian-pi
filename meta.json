@@ -77499,7 +77499,7 @@
       "format": "esm"
     },
     "src/session-service.ts": {
-      "bytes": 3404,
+      "bytes": 3440,
       "imports": [
         {
           "path": "node_modules/@earendil-works/pi-coding-agent/dist/index.js",
@@ -77520,7 +77520,7 @@
       "format": "esm"
     },
     "src/pi-chat-view.ts": {
-      "bytes": 22646,
+      "bytes": 23794,
       "imports": [
         {
           "path": "obsidian",
@@ -77654,7 +77654,7 @@
       "imports": [],
       "exports": [],
       "inputs": {},
-      "bytes": 8378297
+      "bytes": 8378826
     },
     "main.js": {
       "imports": [
@@ -85915,7 +85915,7 @@
           "bytesInOutput": 11
         },
         "src/pi-chat-view.ts": {
-          "bytesInOutput": 13500
+          "bytesInOutput": 14113
         },
         "src/path-utils.ts": {
           "bytesInOutput": 207
@@ -88633,7 +88633,7 @@
           "bytesInOutput": 672
         }
       },
-      "bytes": 7371070
+      "bytes": 7371683
     }
   }
 }

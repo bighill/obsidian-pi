@@ -63,6 +63,8 @@ export class PiChatView extends ItemView {
   private activeMention: { query: string; start: number } | null = null
   private pendingAttachments: PendingAttachment[] = []
   private tabTitle = 'Pi'
+  private autoScrollEnabled = true
+  private ignoreNextScrollEvent = false
 
   constructor(leaf: WorkspaceLeaf, plugin: ObsidianPiPlugin) {
     super(leaf)
@@ -137,6 +139,17 @@ export class PiChatView extends ItemView {
     // Messages container
     this.messagesEl = wrapper.createDiv('pi-chat-messages')
     this.renderer = new MessageRenderer(this.app, this)
+
+    // Track user scroll intent: any user scroll away from the bottom disables
+    // auto-scroll; scrolling back to the bottom re-enables it. Programmatic
+    // scrolls from our own scrollToBottom() are ignored.
+    this.registerDomEvent(this.messagesEl, 'scroll', () => {
+      if (this.ignoreNextScrollEvent) {
+        this.ignoreNextScrollEvent = false
+        return
+      }
+      this.autoScrollEnabled = this.isAtBottom()
+    })
 
     // Input area
     const inputArea = wrapper.createDiv('pi-chat-input-area')
@@ -318,6 +331,7 @@ export class PiChatView extends ItemView {
     this.messages = []
     this.currentAssistantText = ''
     this.currentToolCalls.clear()
+    this.autoScrollEnabled = true
     this.renderer.renderMessages(this.messagesEl, [], this.toolState)
     this.updateClearButton()
     this.updateTabTitle()
@@ -344,11 +358,7 @@ export class PiChatView extends ItemView {
   private updateTabTitle(): void {
     const lastUser = [...this.messages].reverse().find((m) => m.role === 'user')
     if (lastUser?.text) {
-      const preview = lastUser.text
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, 30)
-        .trim()
+      const preview = lastUser.text.replace(/\s+/g, ' ').trim().slice(0, 30).trim()
       const ellipsis = lastUser.text.length > 30 ? '...' : ''
       this.tabTitle = `Pi — ${preview}${ellipsis}`
     } else {
@@ -369,13 +379,14 @@ export class PiChatView extends ItemView {
         const assistantEvent = event.assistantMessageEvent
         if (assistantEvent?.type === 'text_delta') {
           this.currentAssistantText += assistantEvent.delta
+          const shouldAutoScroll = this.autoScrollEnabled
           this.renderer.renderStreaming(
             this.messagesEl,
             this.currentAssistantText,
             this.currentToolCalls,
             this.toolState,
           )
-          this.scrollToBottom()
+          if (shouldAutoScroll) this.scrollToBottom()
         } else if (assistantEvent?.type === 'thinking_delta') {
           // Could render thinking block, for now skip
         }
@@ -389,13 +400,14 @@ export class PiChatView extends ItemView {
           args: JSON.stringify(event.args, null, 2),
         }
         this.currentToolCalls.set(event.toolCallId, toolCall)
+        const shouldAutoScroll = this.autoScrollEnabled
         this.renderer.renderStreaming(
           this.messagesEl,
           this.currentAssistantText,
           this.currentToolCalls,
           this.toolState,
         )
-        this.scrollToBottom()
+        if (shouldAutoScroll) this.scrollToBottom()
         break
       }
 
@@ -406,13 +418,14 @@ export class PiChatView extends ItemView {
           toolCall.result = typeof result === 'string' ? result : JSON.stringify(result, null, 2)
           toolCall.isError = event.isError
         }
+        const shouldAutoScroll = this.autoScrollEnabled
         this.renderer.renderStreaming(
           this.messagesEl,
           this.currentAssistantText,
           this.currentToolCalls,
           this.toolState,
         )
-        this.scrollToBottom()
+        if (shouldAutoScroll) this.scrollToBottom()
         break
       }
 
@@ -431,7 +444,9 @@ export class PiChatView extends ItemView {
         this.currentToolCalls.clear()
         this.isStreaming = false
         this.updateSendButton()
+        const shouldAutoScroll = this.autoScrollEnabled
         this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
+        if (shouldAutoScroll) this.scrollToBottom()
         this.updateClearButton()
         this.persistHistory().catch((err) => {
           console.error('obsidian-pi: failed to persist history:', err)
@@ -488,6 +503,7 @@ export class PiChatView extends ItemView {
       attachments: sentAttachments,
     })
     this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
+    this.autoScrollEnabled = true
     this.scrollToBottom()
     this.updateClearButton()
     this.updateTabTitle()
@@ -503,6 +519,7 @@ export class PiChatView extends ItemView {
         text: 'Error: ' + (err instanceof Error ? err.message : String(err)),
       })
       this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
+      this.autoScrollEnabled = true
       this.scrollToBottom()
       this.updateClearButton()
       this.updateTabTitle()
@@ -588,7 +605,13 @@ export class PiChatView extends ItemView {
   }
 
   private scrollToBottom() {
+    this.ignoreNextScrollEvent = true
     this.messagesEl.scrollTop = this.messagesEl.scrollHeight
+  }
+
+  private isAtBottom(): boolean {
+    const el = this.messagesEl
+    return el.scrollTop + el.clientHeight >= el.scrollHeight
   }
 
   private updateSendButton() {

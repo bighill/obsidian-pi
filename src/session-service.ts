@@ -7,7 +7,10 @@ import {
   type AgentSessionEvent,
   type CreateAgentSessionOptions,
 } from '@earendil-works/pi-coding-agent'
-import { type Model, type Api } from '@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai'
+import {
+  type Model,
+  type Api,
+} from '@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai'
 import { join } from 'path'
 
 export interface SessionStartOptions {
@@ -68,7 +71,10 @@ export class PiSessionService {
         const provider = modelSetting.slice(0, colonIndex)
         const modelId = modelSetting.slice(colonIndex + 1)
         const authStorage = AuthStorage.create(join(options.agentDir, 'auth.json'))
-        const modelRegistry = ModelRegistry.create(authStorage, join(options.agentDir, 'models.json'))
+        const modelRegistry = ModelRegistry.create(
+          authStorage,
+          join(options.agentDir, 'models.json'),
+        )
         const model = modelRegistry.find(provider, modelId) as Model<Api> | undefined
         if (model) {
           createOptions.model = model
