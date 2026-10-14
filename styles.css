@@ -260,6 +260,14 @@
   border-bottom-right-radius: 2px;
 }
 
+.workspace-leaf-content[data-type='pi-chat'] .pi-chat-message-user ::selection,
+.workspace-leaf-content[data-type='pi-chat'] .pi-chat-message-user *::selection,
+.workspace-leaf-content[data-type='pi-chat'] .pi-chat-message-user ::-moz-selection,
+.workspace-leaf-content[data-type='pi-chat'] .pi-chat-message-user *::-moz-selection {
+  background: color-mix(in srgb, var(--text-on-accent) 75%, transparent) !important;
+  color: var(--interactive-accent) !important;
+}
+
 .pi-chat-message-assistant {
   align-self: flex-start;
   background: var(--background-secondary);
