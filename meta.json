@@ -81,7 +81,7 @@
       "format": "esm"
     },
     "src/message-renderer.ts": {
-      "bytes": 8596,
+      "bytes": 9314,
       "imports": [
         {
           "path": "obsidian",
@@ -77654,7 +77654,7 @@
       "imports": [],
       "exports": [],
       "inputs": {},
-      "bytes": 8379421
+      "bytes": 8379945
     },
     "main.js": {
       "imports": [
@@ -85933,7 +85933,7 @@
           "bytesInOutput": 673
         },
         "src/message-renderer.ts": {
-          "bytesInOutput": 3868
+          "bytesInOutput": 4284
         },
         "node_modules/@earendil-works/pi-coding-agent/dist/index.js": {
           "bytesInOutput": 3668
@@ -88633,7 +88633,7 @@
           "bytesInOutput": 672
         }
       },
-      "bytes": 7371947
+      "bytes": 7372363
     }
   }
 }

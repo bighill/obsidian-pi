@@ -193,7 +193,7 @@ export class MessageRenderer {
     if (tc.result !== undefined) {
       resultEl = toolEl.createDiv('pi-chat-tool-result')
       const pre = resultEl.createEl('pre')
-      pre.setText(tc.result)
+      pre.setText(this.extractReadableResult(tc))
       if (!expanded) resultEl.style.display = 'none'
     }
 
@@ -225,6 +225,28 @@ export class MessageRenderer {
       // Not JSON — ignore
     }
     return null
+  }
+
+  private extractReadableResult(tc: ToolCallInfo): string {
+    if (!tc.result) return ''
+    try {
+      const parsed = JSON.parse(tc.result)
+      if (parsed?.content?.text && typeof parsed.content.text === 'string') {
+        return parsed.content.text
+      }
+      if (Array.isArray(parsed?.content)) {
+        const textBlocks: string[] = []
+        for (const block of parsed.content) {
+          if (block?.type === 'text' && typeof block.text === 'string') {
+            textBlocks.push(block.text)
+          }
+        }
+        if (textBlocks.length > 0) return textBlocks.join('\n')
+      }
+    } catch {
+      // Not JSON — fall through to raw result
+    }
+    return tc.result
   }
 
   private extractToolOperationSummary(tc: ToolCallInfo): string | null {
