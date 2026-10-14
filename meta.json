@@ -81,7 +81,7 @@
       "format": "esm"
     },
     "src/message-renderer.ts": {
-      "bytes": 7713,
+      "bytes": 8711,
       "imports": [
         {
           "path": "obsidian",
@@ -77654,7 +77654,7 @@
       "imports": [],
       "exports": [],
       "inputs": {},
-      "bytes": 8378826
+      "bytes": 8379442
     },
     "main.js": {
       "imports": [
@@ -83947,10 +83947,10 @@
           "bytesInOutput": 1384
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/fields.js": {
-          "bytesInOutput": 212
+          "bytesInOutput": 210
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/chatcompletionevents.js": {
-          "bytesInOutput": 456
+          "bytesInOutput": 455
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/funcs/betaObservabilityDatasetsCreate.js": {
           "bytesInOutput": 1533
@@ -85933,7 +85933,7 @@
           "bytesInOutput": 673
         },
         "src/message-renderer.ts": {
-          "bytesInOutput": 3601
+          "bytesInOutput": 3921
         },
         "node_modules/@earendil-works/pi-coding-agent/dist/index.js": {
           "bytesInOutput": 3668
@@ -88633,7 +88633,7 @@
           "bytesInOutput": 672
         }
       },
-      "bytes": 7371683
+      "bytes": 7372000
     }
   }
 }

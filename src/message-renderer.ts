@@ -1,4 +1,4 @@
-import { App, Component, MarkdownRenderer, setIcon } from 'obsidian'
+import { App, Component, MarkdownRenderer } from 'obsidian'
 import { splitFileBlocks } from './at-mention'
 import type { ChatAttachment } from './attachments'
 
@@ -170,20 +170,21 @@ export class MessageRenderer {
     if (expanded) toolEl.addClass('is-expanded')
 
     const header = toolEl.createDiv('pi-chat-tool-header')
-    const iconEl = header.createSpan('pi-chat-tool-icon')
-    setIcon(iconEl, 'wrench')
-
     const nameEl = header.createSpan('pi-chat-tool-name')
-    nameEl.setText(` ${tc.name}`)
 
-    const summary = this.extractToolResultSummary(tc)
+    // For bash, show the full command directly in place of the tool name.
+    if (tc.name === 'bash') {
+      const command = this.extractBashCommand(tc)
+      nameEl.setText(command ? `${command}` : 'bash')
+    } else {
+      nameEl.setText(`${tc.name}`)
+    }
+
+    const summary = tc.name === 'bash' ? null : this.extractToolOperationSummary(tc)
     if (summary) {
       const summaryEl = header.createSpan('pi-chat-tool-summary')
       summaryEl.setText(summary)
     }
-
-    const toggleEl = header.createSpan('pi-chat-tool-toggle')
-    setIcon(toggleEl, expanded ? 'chevron-down' : 'chevron-right')
 
     if (tc.result === undefined) {
       toolEl.addClass('pi-chat-tool-running')
@@ -205,11 +206,9 @@ export class MessageRenderer {
       const isExpanded = toolEl.hasClass('is-expanded')
       if (isExpanded) {
         toolEl.removeClass('is-expanded')
-        setIcon(toggleEl, 'chevron-right')
         if (resultEl) resultEl.style.display = 'none'
       } else {
         toolEl.addClass('is-expanded')
-        setIcon(toggleEl, 'chevron-down')
         if (resultEl) resultEl.style.display = ''
       }
       state.toggled.add(id)
@@ -219,24 +218,55 @@ export class MessageRenderer {
     return toolEl
   }
 
-  private extractToolResultSummary(tc: ToolCallInfo): string | null {
-    if (!tc.result) return null
+  private extractBashCommand(tc: ToolCallInfo): string | null {
+    if (!tc.args) return null
     try {
-      const parsed = JSON.parse(tc.result)
-      if (parsed?.content?.text && typeof parsed.content.text === 'string') {
-        return this.truncateSummary(parsed.content.text)
-      }
-      if (Array.isArray(parsed?.content)) {
-        for (const block of parsed.content) {
-          if (block?.type === 'text' && typeof block.text === 'string') {
-            return this.truncateSummary(block.text)
-          }
-        }
+      const parsed = JSON.parse(tc.args)
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        const command = (parsed as Record<string, unknown>).command
+        if (typeof command === 'string') return command.trim()
       }
     } catch {
       // Not JSON — ignore
     }
     return null
+  }
+
+  private extractToolOperationSummary(tc: ToolCallInfo): string | null {
+    if (!tc.args || tc.name === 'bash') return null
+    try {
+      const parsed = JSON.parse(tc.args)
+      return this.formatToolOperation(tc.name, parsed)
+    } catch {
+      // Not JSON — ignore
+    }
+    return null
+  }
+
+  private formatToolOperation(name: string, args: unknown): string | null {
+    if (!args || typeof args !== 'object' || Array.isArray(args)) return null
+    const a = args as Record<string, unknown>
+    const path = typeof a.path === 'string' ? a.path : undefined
+    const pattern = typeof a.pattern === 'string' ? a.pattern : undefined
+
+    switch (name) {
+      case 'read':
+      case 'write':
+      case 'edit':
+      case 'ls':
+        return path ? this.truncateSummary(path) : null
+      case 'grep':
+      case 'find': {
+        if (!pattern) return null
+        const base = this.truncateSummary(pattern, path ? 50 : 80)
+        return path ? `${base} in ${this.truncateSummary(path, 30)}` : base
+      }
+      default:
+        // Best-effort fallback for unknown/extension tools.
+        if (pattern) return this.truncateSummary(pattern)
+        if (path) return this.truncateSummary(path)
+        return null
+    }
   }
 
   private truncateSummary(text: string, maxLen = 80): string {

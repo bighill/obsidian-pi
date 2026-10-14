@@ -315,12 +315,19 @@
 
 .pi-chat-tool-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 4px 8px;
   background: var(--background-modifier-hover);
   color: var(--text-muted);
   gap: 4px;
   cursor: pointer;
+}
+
+.pi-chat-tool-name {
+  word-break: break-word;
+  white-space: pre-wrap;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .pi-chat-tool-header:hover {
@@ -331,6 +338,7 @@
   margin-left: auto;
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .pi-chat-tool-toggle svg {
