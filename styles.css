@@ -260,11 +260,13 @@
   border-bottom-right-radius: 2px;
 }
 
-.workspace-leaf-content[data-type='pi-chat'] .pi-chat-message-user ::selection,
-.workspace-leaf-content[data-type='pi-chat'] .pi-chat-message-user *::selection,
-.workspace-leaf-content[data-type='pi-chat'] .pi-chat-message-user ::-moz-selection,
-.workspace-leaf-content[data-type='pi-chat'] .pi-chat-message-user *::-moz-selection {
-  background: color-mix(in srgb, var(--text-on-accent) 75%, transparent) !important;
+/*
+  Invert selected text inside the user bubble. Using the bubble's own text
+  color as the selection background guarantees contrast against the accent
+  background in every theme.
+*/
+.pi-chat-message-user ::selection {
+  background-color: var(--text-on-accent) !important;
   color: var(--interactive-accent) !important;
 }
 
