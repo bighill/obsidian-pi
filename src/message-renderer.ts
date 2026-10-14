@@ -177,13 +177,8 @@ export class MessageRenderer {
       const command = this.extractBashCommand(tc)
       nameEl.setText(command ? `${command}` : 'bash')
     } else {
-      nameEl.setText(`${tc.name}`)
-    }
-
-    const summary = tc.name === 'bash' ? null : this.extractToolOperationSummary(tc)
-    if (summary) {
-      const summaryEl = header.createSpan('pi-chat-tool-summary')
-      summaryEl.setText(summary)
+      const summary = this.extractToolOperationSummary(tc)
+      nameEl.setText(summary ? `${tc.name} ${summary}` : `${tc.name}`)
     }
 
     if (tc.result === undefined) {
