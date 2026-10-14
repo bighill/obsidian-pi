@@ -18,7 +18,6 @@ import {
   rankMentions,
   reconcileMentions,
   replaceMention,
-  stripInlineTokens,
 } from './at-mention'
 import {
   createAttachmentFromFile,
@@ -487,8 +486,7 @@ export class PiChatView extends ItemView {
     }
 
     const displayText =
-      stripInlineTokens(text, this.pendingAttachments) ||
-      (hasAttachments ? `📎 ${this.pendingAttachments.map((a) => a.name).join(', ')}` : '')
+      text || (hasAttachments ? `📎 ${this.pendingAttachments.map((a) => a.name).join(', ')}` : '')
 
     this.inputEl.value = ''
     this.inputEl.style.height = 'auto'
