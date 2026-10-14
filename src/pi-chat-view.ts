@@ -488,6 +488,7 @@ export class PiChatView extends ItemView {
       attachments: sentAttachments,
     })
     this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
+    this.scrollToBottom()
     this.updateClearButton()
     this.updateTabTitle()
     await this.persistHistory()
@@ -502,6 +503,7 @@ export class PiChatView extends ItemView {
         text: 'Error: ' + (err instanceof Error ? err.message : String(err)),
       })
       this.renderer.renderMessages(this.messagesEl, this.messages, this.toolState)
+      this.scrollToBottom()
       this.updateClearButton()
       this.updateTabTitle()
       await this.persistHistory()
