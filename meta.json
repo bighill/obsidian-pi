@@ -80,8 +80,13 @@
       ],
       "format": "esm"
     },
+    "src/diff.ts": {
+      "bytes": 1883,
+      "imports": [],
+      "format": "esm"
+    },
     "src/message-renderer.ts": {
-      "bytes": 9314,
+      "bytes": 11890,
       "imports": [
         {
           "path": "obsidian",
@@ -92,6 +97,11 @@
           "path": "src/at-mention.ts",
           "kind": "import-statement",
           "original": "./at-mention"
+        },
+        {
+          "path": "src/diff.ts",
+          "kind": "import-statement",
+          "original": "./diff"
         }
       ],
       "format": "esm"
@@ -77520,7 +77530,7 @@
       "format": "esm"
     },
     "src/pi-chat-view.ts": {
-      "bytes": 23794,
+      "bytes": 23723,
       "imports": [
         {
           "path": "obsidian",
@@ -77654,7 +77664,7 @@
       "imports": [],
       "exports": [],
       "inputs": {},
-      "bytes": 8379945
+      "bytes": 8382732
     },
     "main.js": {
       "imports": [
@@ -85915,7 +85925,7 @@
           "bytesInOutput": 11
         },
         "src/pi-chat-view.ts": {
-          "bytesInOutput": 14113
+          "bytesInOutput": 14084
         },
         "src/path-utils.ts": {
           "bytesInOutput": 207
@@ -85927,13 +85937,16 @@
           "bytesInOutput": 1578
         },
         "src/at-mention.ts": {
-          "bytesInOutput": 1768
+          "bytesInOutput": 1594
         },
         "src/attachments.ts": {
           "bytesInOutput": 673
         },
         "src/message-renderer.ts": {
-          "bytesInOutput": 4284
+          "bytesInOutput": 5499
+        },
+        "src/diff.ts": {
+          "bytesInOutput": 670
         },
         "node_modules/@earendil-works/pi-coding-agent/dist/index.js": {
           "bytesInOutput": 3668
@@ -88633,7 +88646,7 @@
           "bytesInOutput": 672
         }
       },
-      "bytes": 7372363
+      "bytes": 7374045
     }
   }
 }

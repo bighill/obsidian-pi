@@ -413,6 +413,66 @@
   font-size: var(--font-ui-smaller);
 }
 
+/* ─── Edit diff ─────────────────────────────────────────────── */
+
+.pi-chat-diff {
+  padding: 4px 0;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.5;
+}
+
+.pi-chat-diff-line {
+  display: flex;
+  gap: 8px;
+  white-space: pre;
+}
+
+.pi-chat-diff-marker {
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  color: var(--text-faint);
+}
+
+.pi-chat-diff-remove .pi-chat-diff-marker {
+  color: var(--text-error);
+}
+
+.pi-chat-diff-add .pi-chat-diff-marker {
+  color: var(--text-accent);
+}
+
+.pi-chat-diff-remove {
+  background: var(--background-modifier-error);
+  background: color-mix(in srgb, var(--background-modifier-error) 15%, transparent);
+}
+
+.pi-chat-diff-add {
+  background: var(--background-modifier-success);
+  background: color-mix(in srgb, var(--background-modifier-success) 15%, transparent);
+}
+
+.pi-chat-diff-text {
+  color: var(--text-normal);
+}
+
+.pi-chat-diff-same .pi-chat-diff-text {
+  color: var(--text-muted);
+}
+
+.pi-chat-diff-edit-label {
+  padding: 2px 0;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  margin-bottom: 2px;
+}
+
 /* ─── Input area ────────────────────────────────────────────── */
 
 .pi-chat-input-area {

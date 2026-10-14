@@ -1,5 +1,6 @@
 import { App, Component, MarkdownRenderer } from 'obsidian'
 import { splitFileBlocks } from './at-mention'
+import { computeLineDiff } from './diff'
 import type { ChatAttachment } from './attachments'
 
 /** A rendered chat message stored in the view. */
@@ -192,8 +193,11 @@ export class MessageRenderer {
     let resultEl: HTMLElement | null = null
     if (tc.result !== undefined) {
       resultEl = toolEl.createDiv('pi-chat-tool-result')
-      const pre = resultEl.createEl('pre')
-      pre.setText(this.extractReadableResult(tc))
+      const diffRendered = tc.name === 'edit' && this.renderEditDiff(resultEl, tc)
+      if (!diffRendered) {
+        const pre = resultEl.createEl('pre')
+        pre.setText(this.extractReadableResult(tc))
+      }
       if (!expanded) resultEl.style.display = 'none'
     }
 
@@ -211,6 +215,80 @@ export class MessageRenderer {
     })
 
     return toolEl
+  }
+
+  private renderEditDiff(container: HTMLElement, tc: ToolCallInfo): boolean {
+    if (tc.isError) return false
+    const editArgs = this.parseEditArgs(tc)
+    if (!editArgs) return false
+
+    let anyRendered = false
+    for (let i = 0; i < editArgs.edits.length; i++) {
+      const { oldText, newText } = editArgs.edits[i]
+      const diff = computeLineDiff(oldText, newText)
+      if (!diff || diff.length === 0) continue
+      anyRendered = true
+
+      const wrapper = container.createDiv('pi-chat-diff')
+      if (editArgs.edits.length > 1) {
+        wrapper.createEl('div', {
+          cls: 'pi-chat-diff-edit-label',
+          text: `Edit ${i + 1}/${editArgs.edits.length}`,
+        })
+      }
+      for (const line of diff) {
+        const lineEl = wrapper.createDiv(`pi-chat-diff-line pi-chat-diff-${line.type}`)
+        lineEl.createSpan({
+          cls: 'pi-chat-diff-marker',
+          text: line.type === 'same' ? ' ' : line.type === 'remove' ? '-' : '+',
+        })
+        lineEl.createSpan({ cls: 'pi-chat-diff-text', text: line.text })
+      }
+    }
+    return anyRendered
+  }
+
+  private parseEditArgs(
+    tc: ToolCallInfo,
+  ): { path?: string; edits: { oldText: string; newText: string }[] } | null {
+    if (tc.name !== 'edit' || !tc.args) return null
+    try {
+      const parsed = JSON.parse(tc.args)
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null
+      const a = parsed as Record<string, unknown>
+
+      let editsInput: unknown = a.edits
+      if (typeof editsInput === 'string') {
+        try {
+          editsInput = JSON.parse(editsInput)
+        } catch {
+          editsInput = undefined
+        }
+      }
+
+      const edits: { oldText: string; newText: string }[] = []
+      if (Array.isArray(editsInput)) {
+        for (const edit of editsInput) {
+          if (
+            edit &&
+            typeof edit === 'object' &&
+            typeof edit.oldText === 'string' &&
+            typeof edit.newText === 'string'
+          ) {
+            edits.push({ oldText: edit.oldText, newText: edit.newText })
+          }
+        }
+      }
+
+      if (typeof a.oldText === 'string' && typeof a.newText === 'string') {
+        edits.push({ oldText: a.oldText, newText: a.newText })
+      }
+
+      if (edits.length === 0) return null
+      return { path: typeof a.path === 'string' ? a.path : undefined, edits }
+    } catch {
+      return null
+    }
   }
 
   private extractBashCommand(tc: ToolCallInfo): string | null {
