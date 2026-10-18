@@ -33,7 +33,7 @@
 .pi-chat-status {
   font-size: var(--font-ui-small);
   font-weight: var(--font-semibold);
-  color: var(--text-normal);
+  color: var(--text-muted);
   min-width: 0;
   max-width: 60%;
   white-space: nowrap;
@@ -48,7 +48,7 @@
 }
 
 .pi-chat-status-ready {
-  color: var(--text-normal);
+  color: var(--text-muted);
 }
 
 .pi-chat-status-error {
