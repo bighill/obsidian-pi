@@ -84,14 +84,12 @@ export class PiChatView extends ItemView {
 
     // Header bar
     const header = wrapper.createDiv('pi-chat-header')
-    const titleEl = header.createDiv('pi-chat-title')
-    titleEl.setText('Pi')
+    this.statusEl = header.createDiv('pi-chat-status')
+    this.statusEl.setText('Not connected')
 
     this.contextEl = header.createDiv('pi-chat-context')
     this.contextEl.setText('')
 
-    this.statusEl = header.createDiv('pi-chat-status')
-    this.statusEl.setText('Not connected')
     this.retryBtn = header.createDiv('pi-chat-retry')
     setIcon(this.retryBtn, 'refresh-cw')
     this.retryBtn.setAttribute('aria-label', 'Retry connection')

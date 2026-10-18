@@ -77498,7 +77498,7 @@
       "format": "esm"
     },
     "src/pi-chat-view.ts": {
-      "bytes": 20500,
+      "bytes": 20411,
       "imports": [
         {
           "path": "obsidian",
@@ -77560,7 +77560,7 @@
       "format": "esm"
     },
     "src/main.ts": {
-      "bytes": 2808,
+      "bytes": 2807,
       "imports": [
         {
           "path": "src/sdk-runtime-init.ts",
@@ -77591,7 +77591,7 @@
       "imports": [],
       "exports": [],
       "inputs": {},
-      "bytes": 8377969
+      "bytes": 8377931
     },
     "main.js": {
       "imports": [
@@ -85827,7 +85827,7 @@
           "bytesInOutput": 11
         },
         "src/pi-chat-view.ts": {
-          "bytesInOutput": 11872
+          "bytesInOutput": 11829
         },
         "src/inline-suggest.ts": {
           "bytesInOutput": 1578
@@ -88539,7 +88539,7 @@
           "bytesInOutput": 1389
         }
       },
-      "bytes": 7369579
+      "bytes": 7369536
     }
   }
 }
