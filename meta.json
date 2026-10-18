@@ -22,38 +22,6 @@
       ],
       "format": "esm"
     },
-    "src/path-utils.ts": {
-      "bytes": 514,
-      "imports": [
-        {
-          "path": "os",
-          "kind": "import-statement",
-          "external": true
-        }
-      ],
-      "format": "esm"
-    },
-    "src/cwd-options.ts": {
-      "bytes": 1204,
-      "imports": [
-        {
-          "path": "fs",
-          "kind": "import-statement",
-          "external": true
-        },
-        {
-          "path": "path",
-          "kind": "import-statement",
-          "external": true
-        },
-        {
-          "path": "src/path-utils.ts",
-          "kind": "import-statement",
-          "original": "./path-utils"
-        }
-      ],
-      "format": "esm"
-    },
     "src/inline-suggest.ts": {
       "bytes": 3119,
       "imports": [],
@@ -77509,7 +77477,7 @@
       "format": "esm"
     },
     "src/session-service.ts": {
-      "bytes": 3440,
+      "bytes": 3082,
       "imports": [
         {
           "path": "node_modules/@earendil-works/pi-coding-agent/dist/index.js",
@@ -77530,7 +77498,7 @@
       "format": "esm"
     },
     "src/pi-chat-view.ts": {
-      "bytes": 23723,
+      "bytes": 20500,
       "imports": [
         {
           "path": "obsidian",
@@ -77551,16 +77519,6 @@
           "path": "os",
           "kind": "import-statement",
           "external": true
-        },
-        {
-          "path": "src/path-utils.ts",
-          "kind": "import-statement",
-          "original": "./path-utils"
-        },
-        {
-          "path": "src/cwd-options.ts",
-          "kind": "import-statement",
-          "original": "./cwd-options"
         },
         {
           "path": "src/inline-suggest.ts",
@@ -77591,44 +77549,18 @@
       "format": "esm"
     },
     "src/settings-tab.ts": {
-      "bytes": 3446,
+      "bytes": 2264,
       "imports": [
         {
           "path": "obsidian",
           "kind": "import-statement",
           "external": true
-        },
-        {
-          "path": "fs",
-          "kind": "import-statement",
-          "external": true
-        },
-        {
-          "path": "src/path-utils.ts",
-          "kind": "import-statement",
-          "original": "./path-utils"
-        }
-      ],
-      "format": "esm"
-    },
-    "src/cwd-switcher-modal.ts": {
-      "bytes": 1260,
-      "imports": [
-        {
-          "path": "obsidian",
-          "kind": "import-statement",
-          "external": true
-        },
-        {
-          "path": "src/cwd-options.ts",
-          "kind": "import-statement",
-          "original": "./cwd-options"
         }
       ],
       "format": "esm"
     },
     "src/main.ts": {
-      "bytes": 3000,
+      "bytes": 2808,
       "imports": [
         {
           "path": "src/sdk-runtime-init.ts",
@@ -77649,11 +77581,6 @@
           "path": "src/settings-tab.ts",
           "kind": "import-statement",
           "original": "./settings-tab"
-        },
-        {
-          "path": "src/cwd-switcher-modal.ts",
-          "kind": "import-statement",
-          "original": "./cwd-switcher-modal"
         }
       ],
       "format": "esm"
@@ -77664,7 +77591,7 @@
       "imports": [],
       "exports": [],
       "inputs": {},
-      "bytes": 8382732
+      "bytes": 8377969
     },
     "main.js": {
       "imports": [
@@ -79094,21 +79021,6 @@
           "external": true
         },
         {
-          "path": "os",
-          "kind": "require-call",
-          "external": true
-        },
-        {
-          "path": "fs",
-          "kind": "require-call",
-          "external": true
-        },
-        {
-          "path": "path",
-          "kind": "require-call",
-          "external": true
-        },
-        {
           "path": "obsidian",
           "kind": "require-call",
           "external": true
@@ -80040,16 +79952,6 @@
         },
         {
           "path": "path",
-          "kind": "require-call",
-          "external": true
-        },
-        {
-          "path": "obsidian",
-          "kind": "require-call",
-          "external": true
-        },
-        {
-          "path": "fs",
           "kind": "require-call",
           "external": true
         },
@@ -83960,7 +83862,7 @@
           "bytesInOutput": 210
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/chatcompletionevents.js": {
-          "bytesInOutput": 455
+          "bytesInOutput": 453
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/funcs/betaObservabilityDatasetsCreate.js": {
           "bytesInOutput": 1533
@@ -84026,10 +83928,10 @@
           "bytesInOutput": 1771
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/records.js": {
-          "bytesInOutput": 367
+          "bytesInOutput": 365
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/datasets.js": {
-          "bytesInOutput": 1022
+          "bytesInOutput": 1019
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/funcs/betaObservabilityJudgesCreate.js": {
           "bytesInOutput": 1525
@@ -84050,7 +83952,7 @@
           "bytesInOutput": 1648
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/judges.js": {
-          "bytesInOutput": 356
+          "bytesInOutput": 354
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/funcs/betaObservabilityLogsFetchOptions.js": {
           "bytesInOutput": 1654
@@ -84062,7 +83964,7 @@
           "bytesInOutput": 1627
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/logs.js": {
-          "bytesInOutput": 201
+          "bytesInOutput": 199
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/funcs/betaObservabilitySpansFetchSpanEvalFieldOptions.js": {
           "bytesInOutput": 1692
@@ -84086,7 +83988,7 @@
           "bytesInOutput": 1630
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/spans.js": {
-          "bytesInOutput": 484
+          "bytesInOutput": 482
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/funcs/betaObservabilityTracesFetchOptions.js": {
           "bytesInOutput": 1660
@@ -84110,7 +84012,7 @@
           "bytesInOutput": 376
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/sdk/observability.js": {
-          "bytesInOutput": 916
+          "bytesInOutput": 911
         },
         "node_modules/@earendil-works/pi-coding-agent/node_modules/@mistralai/mistralai/esm/funcs/betaRagIngestionPipelineConfigurationsList.js": {
           "bytesInOutput": 1293
@@ -85916,7 +85818,7 @@
           "bytesInOutput": 4376
         },
         "src/main.ts": {
-          "bytesInOutput": 1490
+          "bytesInOutput": 1389
         },
         "src/sdk-runtime.ts": {
           "bytesInOutput": 1159
@@ -85925,13 +85827,7 @@
           "bytesInOutput": 11
         },
         "src/pi-chat-view.ts": {
-          "bytesInOutput": 14084
-        },
-        "src/path-utils.ts": {
-          "bytesInOutput": 207
-        },
-        "src/cwd-options.ts": {
-          "bytesInOutput": 400
+          "bytesInOutput": 11872
         },
         "src/inline-suggest.ts": {
           "bytesInOutput": 1578
@@ -88637,16 +88533,13 @@
           "bytesInOutput": 720
         },
         "src/session-service.ts": {
-          "bytesInOutput": 1150
+          "bytesInOutput": 981
         },
         "src/settings-tab.ts": {
-          "bytesInOutput": 2076
-        },
-        "src/cwd-switcher-modal.ts": {
-          "bytesInOutput": 672
+          "bytesInOutput": 1389
         }
       },
-      "bytes": 7374045
+      "bytes": 7369579
     }
   }
 }

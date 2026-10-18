@@ -1,7 +1,5 @@
-import { App, Notice, PluginSettingTab, Setting } from 'obsidian'
-import { statSync } from 'fs'
+import { App, PluginSettingTab, Setting } from 'obsidian'
 import type ObsidianPiPlugin from './main'
-import { collapseHome, expandHome } from './path-utils'
 
 export class PiPluginSettingTab extends PluginSettingTab {
   plugin: ObsidianPiPlugin
@@ -30,30 +28,6 @@ export class PiPluginSettingTab extends PluginSettingTab {
             await this.plugin.clearHistory()
           }
         })
-      })
-
-    new Setting(containerEl)
-      .setName('Focus target')
-      .setDesc(
-        'Directory Pi focuses on when focus mode is enabled. Leave blank to keep the vault root as the target.',
-      )
-      .addText((text) => {
-        text
-          .setPlaceholder('/path/to/project')
-          .setValue(collapseHome(this.plugin.settings.workingDir))
-          .onChange(async (value) => {
-            const trimmed = value.trim()
-            const expanded = expandHome(trimmed)
-            if (trimmed && !this.isValidDir(expanded)) {
-              new Notice(`Working directory is not a valid directory: ${trimmed}`)
-              text.inputEl.addClass('pi-setting-invalid')
-              return
-            }
-            text.inputEl.removeClass('pi-setting-invalid')
-            this.plugin.settings.workingDir = expanded
-            await this.plugin.saveSettings()
-            await this.plugin.restartChatSessions()
-          })
       })
 
     new Setting(containerEl)
@@ -91,13 +65,5 @@ export class PiPluginSettingTab extends PluginSettingTab {
             await this.plugin.restartChatSessions()
           })
       })
-  }
-
-  private isValidDir(path: string): boolean {
-    try {
-      return statSync(path).isDirectory()
-    } catch {
-      return false
-    }
   }
 }

@@ -22,8 +22,6 @@ export interface SessionStartOptions {
   thinkingLevel?: CreateAgentSessionOptions['thinkingLevel']
   /** Optional model in "provider:modelId" format. */
   model?: string
-  /** Reason this session is starting, so we can tailor the injected CWD focus message. */
-  reason?: 'initial' | 'cwd-change'
 }
 
 /**
@@ -42,15 +40,13 @@ export class PiSessionService {
   ): Promise<AgentSession> {
     this.stop()
 
-    const focusMessage =
-      options.reason === 'cwd-change'
-        ? `CWD has changed to ${options.cwd}. Please focus the rest of this session on dir ${options.cwd}.`
-        : `The current working directory is ${options.cwd}. Please focus the rest of this session on dir ${options.cwd}.`
-
     const resourceLoader = new DefaultResourceLoader({
       cwd: options.cwd,
       agentDir: options.agentDir,
-      appendSystemPrompt: [`Current timestamp: ${new Date().toISOString()}`, focusMessage],
+      appendSystemPrompt: [
+        `Current timestamp: ${new Date().toISOString()}`,
+        `The current working directory is ${options.cwd}.`,
+      ],
     })
     await resourceLoader.reload()
 

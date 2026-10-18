@@ -42,12 +42,9 @@ CI runs typecheck → lint → test → build on Node 22 and 24.
 
 - `src/sdk-runtime-init.ts` must be imported first in `src/main.ts` before any Pi SDK module. It configures `PI_PACKAGE_DIR`, `PATH`, and `PI_OFFLINE=1`.
 - Pi SDK is bundled as a single CJS file. The build polyfills `import.meta.url` and forces `import()` to `require()` because Obsidian's renderer rejects `node:*` dynamic imports.
-- Plugin settings (`model`, `thinkingLevel`, `workingDir`, `focus`, `saveHistory`, `history`) are global plugin data, shared across all open chat tabs.
+- Plugin settings (`model`, `thinkingLevel`, `saveHistory`, `history`) are global plugin data, shared across all open chat tabs.
 - Each `PiChatView` owns its own `PiSessionService` instance, so sessions are per-tab.
-- Working directory logic:
-  - Focus off → vault root.
-  - Focus on → `workingDir` expanded, or vault root if blank.
-  - Toggle / change restarts sessions with reason `'cwd-change'`.
+- Working directory logic: sessions always run at the vault root (`FileSystemAdapter.getBasePath()`, falling back to `process.cwd()` for non-file-system adapters). The legacy focus-mode / `workingDir` feature was removed; stale `focus` and `workingDir` keys are stripped from `data.json` on load.
 - `@`-mention file picker: type `@` in input; fuzzy search vault files; selecting attaches file inline. Deleting the `@path` token drops the attachment.
 - Tool calls render as collapsible cards; in-progress calls get a spinner.
 

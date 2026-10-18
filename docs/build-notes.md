@@ -58,8 +58,8 @@ npm tarball via `package.json` `files` and is ignored by Git via `.gitignore`.
 ## Platform constraints
 
 - The plugin runs inside Obsidian's Electron renderer, not a full Node process.
-- Working-directory resolution prefers the configured `workingDir`, then the
-  vault root if the adapter is a `FileSystemAdapter`, then `process.cwd()` as a
-  fallback.
+- Working-directory resolution: the vault root is used when the adapter is a
+  `FileSystemAdapter`, then `process.cwd()` as a fallback. (The focus-mode
+  `workingDir` setting was removed.)
 - macOS-specific path assumptions from earlier versions were removed; the build
   and runtime helpers now work on any platform supported by Obsidian.

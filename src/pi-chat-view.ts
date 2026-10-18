@@ -10,15 +10,8 @@ import type ObsidianPiPlugin from './main'
 import { type AgentSessionEvent } from '@earendil-works/pi-coding-agent'
 import { join } from 'path'
 import { homedir } from 'os'
-import { expandHome } from './path-utils'
-import { currentCwdLabel, listCwdOptions } from './cwd-options'
 import { InlineSuggest, type SuggestItem } from './inline-suggest'
-import {
-  detectMention,
-  rankMentions,
-  reconcileMentions,
-  replaceMention,
-} from './at-mention'
+import { detectMention, rankMentions, reconcileMentions, replaceMention } from './at-mention'
 import {
   createAttachmentFromFile,
   type ChatAttachment,
@@ -46,8 +39,6 @@ export class PiChatView extends ItemView {
   private retryBtn!: HTMLElement
   private clearBtn!: HTMLElement
   private contextEl!: HTMLElement
-  private focusToggleBtn!: HTMLElement
-  private domainSelect!: HTMLSelectElement
   private contextUpdateInterval: number | null = null
   private messages: ChatMessage[] = []
   private isStreaming = false
@@ -98,24 +89,6 @@ export class PiChatView extends ItemView {
 
     this.contextEl = header.createDiv('pi-chat-context')
     this.contextEl.setText('')
-
-    const focusWrap = header.createDiv('pi-chat-focus')
-    this.focusToggleBtn = focusWrap.createEl('button', {
-      cls: 'pi-chat-focus-toggle',
-    })
-    setIcon(this.focusToggleBtn, 'target')
-    this.focusToggleBtn.setAttribute('aria-label', 'Focus on subdomain (off)')
-    this.focusToggleBtn.setAttribute('aria-pressed', 'false')
-    this.registerDomEvent(this.focusToggleBtn, 'click', () => {
-      void this.toggleFocus()
-    })
-
-    this.domainSelect = focusWrap.createEl('select', { cls: 'pi-chat-domain' })
-    this.registerDomEvent(this.domainSelect, 'change', () => {
-      void this.handleCwdChange()
-    })
-    this.refreshCwdSelect()
-    this.refreshFocusToggle()
 
     this.statusEl = header.createDiv('pi-chat-status')
     this.statusEl.setText('Not connected')
@@ -237,14 +210,14 @@ export class PiChatView extends ItemView {
     this.updateTabTitle()
   }
 
-  private async initSession(reason: 'initial' | 'cwd-change' = 'initial') {
+  private async initSession() {
     try {
       this.statusEl.setText('Starting session…')
       this.statusEl.setAttribute('title', '')
       this.statusEl.addClass('pi-chat-status-busy')
       this.statusEl.removeClass('pi-chat-status-ready', 'pi-chat-status-error')
 
-      const cwd = this.getEffectiveCwd()
+      const cwd = this.getSessionCwd()
       const agentDir = join(homedir(), '.pi', 'agent')
 
       const session = await this.sessionService.start(
@@ -253,7 +226,6 @@ export class PiChatView extends ItemView {
           agentDir,
           thinkingLevel: this.plugin.settings.thinkingLevel || undefined,
           model: this.plugin.settings.model || undefined,
-          reason,
         },
         (event: AgentSessionEvent) => this.handleSessionEvent(event),
       )
@@ -265,8 +237,6 @@ export class PiChatView extends ItemView {
       this.statusEl.addClass('pi-chat-status-ready')
       this.statusEl.removeClass('pi-chat-status-error')
       this.retryBtn.addClass('is-hidden')
-      this.refreshCwdSelect()
-      this.refreshFocusToggle()
       this.startContextPoller()
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
@@ -295,7 +265,6 @@ export class PiChatView extends ItemView {
       this.contextEl.setText('')
       this.contextEl.removeAttribute('title')
       this.contextEl.removeClass('low', 'medium', 'high')
-      this.domainSelect?.removeClass('low', 'medium', 'high')
       return
     }
     const pct = Math.round(usage.percent)
@@ -306,16 +275,12 @@ export class PiChatView extends ItemView {
       `${tokens.toLocaleString()} / ${usage.contextWindow.toLocaleString()} tokens`,
     )
     this.contextEl.removeClass('low', 'medium', 'high')
-    this.domainSelect?.removeClass('low', 'medium', 'high')
     if (pct < 50) {
       this.contextEl.addClass('low')
-      this.domainSelect?.addClass('low')
     } else if (pct < 80) {
       this.contextEl.addClass('medium')
-      this.domainSelect?.addClass('medium')
     } else {
       this.contextEl.addClass('high')
-      this.domainSelect?.addClass('high')
     }
   }
 
@@ -645,7 +610,7 @@ export class PiChatView extends ItemView {
     }
   }
 
-  async restartSession(reason: 'initial' | 'cwd-change' = 'initial'): Promise<void> {
+  async restartSession(): Promise<void> {
     this.stopContextPoller()
     this.sessionService.stop()
     this.currentAssistantText = ''
@@ -653,72 +618,13 @@ export class PiChatView extends ItemView {
     this.isStreaming = false
     this.updateSendButton()
     this.retryBtn?.addClass('is-hidden')
-    await this.initSession(reason)
+    await this.initSession()
   }
 
-  private refreshCwdSelect(): void {
-    if (!this.domainSelect) return
-    const targetCwd = this.getTargetCwd()
-    const options = listCwdOptions(targetCwd)
-
-    this.domainSelect.empty()
-    this.domainSelect.createEl('option', {
-      text: currentCwdLabel(targetCwd),
-      value: targetCwd,
-    })
-    for (const option of options) {
-      this.domainSelect.createEl('option', { text: option.label, value: option.value })
-    }
-    this.domainSelect.value = targetCwd
-  }
-
-  private async handleCwdChange(): Promise<void> {
-    const newTarget = this.domainSelect.value
-    const currentTarget = this.getTargetCwd()
-    if (newTarget === currentTarget) return
-    this.plugin.settings.workingDir = newTarget === this.getDefaultCwd() ? '' : newTarget
-    await this.plugin.saveSettings()
-    if (this.plugin.settings.focus) {
-      await this.restartSession('cwd-change')
-    } else {
-      this.refreshCwdSelect()
-    }
-  }
-
-  private getEffectiveCwd(): string {
-    if (!this.plugin.settings.focus) {
-      return this.getDefaultCwd()
-    }
-    return expandHome(this.plugin.settings.workingDir) || this.getDefaultCwd()
-  }
-
-  private getDefaultCwd(): string {
+  private getSessionCwd(): string {
     return this.app.vault.adapter instanceof FileSystemAdapter
       ? this.app.vault.adapter.getBasePath()
       : process.cwd()
-  }
-
-  private getTargetCwd(): string {
-    return expandHome(this.plugin.settings.workingDir) || this.getDefaultCwd()
-  }
-
-  private refreshFocusToggle(): void {
-    if (!this.focusToggleBtn) return
-    const focused = this.plugin.settings.focus
-    this.focusToggleBtn.toggleClass('is-active', focused)
-    this.focusToggleBtn.setAttribute('aria-pressed', String(focused))
-    this.focusToggleBtn.setAttribute(
-      'aria-label',
-      focused ? 'Focus on subdomain (on)' : 'Focus on subdomain (off)',
-    )
-    this.domainSelect?.toggleClass('is-hidden', !focused)
-  }
-
-  private async toggleFocus(): Promise<void> {
-    this.plugin.settings.focus = !this.plugin.settings.focus
-    await this.plugin.saveSettings()
-    this.refreshFocusToggle()
-    await this.restartSession('cwd-change')
   }
 
   async onClose() {
